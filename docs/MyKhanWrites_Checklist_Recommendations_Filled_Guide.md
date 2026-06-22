@@ -128,7 +128,7 @@ Reason:
 **Current manuscript status:** Editing  
 **Status:** Correct. Keep.
 
-**Approximate word count:** ~55,000  
+**Approximate word count:** ~55,000+ 
 **Status:** Correct internally. Do not show publicly unless needed.
 
 **Is this your debut published novel?**  
