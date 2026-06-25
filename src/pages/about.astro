@@ -10,11 +10,12 @@
  *      Leave data-umami-event hook for Phase-10 writing-tool-outbound event on that link
  *   4. CTAs — LettersForm(full) + ArrowLink "Read about the novel →" → /novel/
  *
- * Person JSON-LD: Phase 11 — do NOT add here.
+ * Person JSON-LD: emitted via the head slot (Phase 11).
  */
 
 import { getEntry, render } from 'astro:content';
 import { site } from '../lib/data';
+import { buildPersonJsonLd, serializeJsonLd } from '../lib/jsonld';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/Section.astro';
 import Container from '../components/Container.astro';
@@ -25,9 +26,17 @@ import LettersForm from '../components/LettersForm.astro';
 const aboutEntry = await getEntry('pages', 'about');
 const { title, description } = aboutEntry.data;
 const { Content } = await render(aboutEntry);
+
+const personJsonLd = serializeJsonLd(buildPersonJsonLd());
 ---
 
 <BaseLayout title={title} description={description}>
+  <script
+    is:inline
+    slot="head"
+    type="application/ld+json"
+    set:html={personJsonLd}
+  />
 
   <!-- ═══════════════════════════════════════════════════════════════
        1. PAGE HERO — eyebrow kicker + h1

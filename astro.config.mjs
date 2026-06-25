@@ -21,7 +21,13 @@ export default defineConfig({
     format: 'directory',
   },
 
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      // Exclude /letters/ — reserved/noindex route, not intended for crawlers.
+      // /screen/ is already absent while gated (not emitted as a static route).
+      filter: (page) => !page.includes('/letters/'),
+    }),
+  ],
 
   vite: {
     plugins: [tailwindcss()],

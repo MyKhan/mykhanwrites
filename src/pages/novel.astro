@@ -15,13 +15,14 @@
  *   7. Page CTAs (§2.6) — LettersForm(full) + ArrowLink "Enter the novel world →"
  *   8. Content note — novel.contentNote
  *
- * Phase 11: Book JSON-LD will be added here. No JSON-LD in this phase.
+ * Book JSON-LD: emitted via the head slot (Phase 11). Cross-linked to Person @id on /about.
  *
  * Spoiler-safe: twist, cranes' meaning, girl's identity, ending, "Platform 9" NEVER appear.
  */
 
 import { getEntry } from 'astro:content';
 import { novel } from '../lib/data';
+import { buildBookJsonLd, serializeJsonLd } from '../lib/jsonld';
 import { inlineMarkdown } from '../lib/inlineMarkdown';
 import { EVENTS } from '../lib/analytics';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -35,9 +36,17 @@ import AtmosphereStrip from '../components/AtmosphereStrip.astro';
 
 const novelPage = await getEntry('pages', 'novel');
 const { title, description } = novelPage.data;
+
+const bookJsonLd = serializeJsonLd(buildBookJsonLd());
 ---
 
 <BaseLayout title={title} description={description}>
+  <script
+    is:inline
+    slot="head"
+    type="application/ld+json"
+    set:html={bookJsonLd}
+  />
 
   <!-- ═══════════════════════════════════════════════════════════════
        1. NOVEL HERO — warm-duotone + vignette (image PENDING)
