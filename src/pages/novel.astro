@@ -1,0 +1,336 @@
+---
+/**
+ * novel.astro — /novel page
+ *
+ * The ONE place raincoat-yellow (#E8C547 / --color-yellow) is allowed on the site.
+ * Used ONLY as a tiny accent: a single small lit dot in the hero scene.
+ *
+ * Sections (brief §2):
+ *   1. Rich novel hero — warm-duotone + vignette placeholder (image PENDING)
+ *   2. Epigraph (§2.1) — novel.epigraph via Epigraph primitive
+ *   3. "What it's about" (§2.2) — novel.whatItsAbout
+ *   4. "The feeling" (§2.3) — novel.theFeeling (NO genre label)
+ *   5. AtmosphereStrip (§2.4) — 5 surface-only fragments
+ *   6. Reader reactions (§2.5) — novel.quotes=[] — EMPTY reserved slot, no fabricated quotes
+ *   7. Page CTAs (§2.6) — LettersForm(full) + ArrowLink "Enter the novel world →"
+ *   8. Content note — novel.contentNote
+ *
+ * Phase 11: Book JSON-LD will be added here. No JSON-LD in this phase.
+ *
+ * Spoiler-safe: twist, cranes' meaning, girl's identity, ending, "Platform 9" NEVER appear.
+ */
+
+import { getEntry } from 'astro:content';
+import { novel } from '../lib/data';
+import { inlineMarkdown } from '../lib/inlineMarkdown';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import Container from '../components/Container.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Epigraph from '../components/primitives/Epigraph.astro';
+import ArrowLink from '../components/primitives/ArrowLink.astro';
+import LettersForm from '../components/LettersForm.astro';
+import AtmosphereStrip from '../components/AtmosphereStrip.astro';
+
+const novelPage = await getEntry('pages', 'novel');
+const { title, description } = novelPage.data;
+---
+
+<BaseLayout title={title} description={description}>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       1. NOVEL HERO — warm-duotone + vignette (image PENDING)
+          role="img" + aria-label is on the hero div itself (reachable).
+          TINY raincoat-yellow accent: one small lit dot — the Raincoat Rule.
+          Do NOT wrap this in aria-hidden.
+       ═══════════════════════════════════════════════════════════════ -->
+  <div
+    class="novel-hero"
+    role="img"
+    aria-label={novel.heroAlt}
+  >
+    <!-- Vignette overlay (not grain — grain is the global fixed Grain.astro) -->
+    <div class="novel-hero__vignette" aria-hidden="true"></div>
+
+    <!-- TINY raincoat-yellow accent: a single small lit mark (the Raincoat Rule).
+         One warm glow point — like a lantern seen through rain-streaked glass.
+         Never a fill, never a stripe. Only here on /novel. -->
+    <div class="novel-hero__yellow-dot" aria-hidden="true"></div>
+
+    <div class="novel-hero__content">
+      <!-- Reserved cover slot — uncomment when image is ready
+      <img
+        src="/images/novel-cover.jpg"
+        alt={novel.heroAlt}
+        class="novel-hero__cover"
+        width="320"
+        height="480"
+        loading="eager"
+        decoding="async"
+      />
+      -->
+
+      <div class="novel-hero__text">
+        <p class="novel-hero__launch">{novel.launch}</p>
+        <h1 class="novel-hero__title">{novel.title}</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       2. EPIGRAPH (§2.1) — novel.epigraph via Epigraph primitive
+          Fraunces italic, 2px amber left-rule.
+       ═══════════════════════════════════════════════════════════════ -->
+  <Section id="novel-epigraph">
+    <Epigraph>{novel.epigraph}</Epigraph>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       3. "WHAT IT'S ABOUT" (§2.2) — novel.whatItsAbout (verbatim)
+       ═══════════════════════════════════════════════════════════════ -->
+  <Section id="novel-about">
+    <div class="novel-prose">
+      <Eyebrow>What it's about</Eyebrow>
+      <h2 class="novel-section-heading sr-only">What it's about</h2>
+      <p class="novel-body">{novel.whatItsAbout}</p>
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       4. "THE FEELING" (§2.3) — novel.theFeeling (verbatim)
+          NO genre label. Comps embedded in prose.
+       ═══════════════════════════════════════════════════════════════ -->
+  <Section id="novel-feeling">
+    <div class="novel-prose">
+      <Eyebrow>The feeling</Eyebrow>
+      <h2 class="novel-section-heading sr-only">The feeling</h2>
+      <p class="novel-body novel-feeling-text" set:html={inlineMarkdown(novel.theFeeling)} />
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       5. ATMOSPHERE STRIP (§2.4) — 5 surface-only fragments
+          Surface-only: meanings not explained. Spoiler-safe.
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="novel-atmosphere" class="novel-atmosphere-section">
+    <Container>
+      <AtmosphereStrip />
+    </Container>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       6. READER REACTIONS (§2.5) — novel.quotes is []
+          Empty reserved slot — no fabricated quotes, no broken UI.
+          When quotes arrive, uncomment the block below.
+       ═══════════════════════════════════════════════════════════════ -->
+  {/*
+    READER QUOTES — reserved for Phase 11+ when novel.quotes is populated.
+    novel.quotes is currently [] — no quotes rendered.
+    When quotes are available:
+    <Section id="novel-quotes">
+      <div class="novel-prose">
+        <Eyebrow>Readers</Eyebrow>
+        {novel.quotes.map((quote) => (
+          <blockquote class="novel-reader-quote">{quote}</blockquote>
+        ))}
+      </div>
+    </Section>
+  */}
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       7. PAGE CTAs (§2.6 / Triage T10)
+          - LettersForm variant="full" (the SAME full newsletter spine)
+          - ArrowLink "Enter the novel world →" → novel.novelWorldUrl
+       ═══════════════════════════════════════════════════════════════ -->
+  <Section id="novel-cta">
+    <div class="novel-cta-inner">
+      <LettersForm variant="full" />
+
+      <div class="novel-world-link">
+        <ArrowLink href={novel.novelWorldUrl}>
+          Enter the novel world →
+        </ArrowLink>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       8. CONTENT NOTE — novel.contentNote
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="novel-content-note" class="novel-content-note-section">
+    <Container>
+      <p class="novel-content-note">{novel.contentNote}</p>
+    </Container>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ── Hero ──────────────────────────────────────────────────────── */
+  .novel-hero {
+    position: relative;
+    min-height: clamp(420px, 60vh, 680px);
+    display: flex;
+    align-items: flex-end;
+
+    /* Warm-duotone gradient placeholder — UI Kit §5 treatment.
+       Strongest atmospheric treatment on the site.
+       Duotone: deep ink → warm sepia → pale parchment-gold */
+    background:
+      linear-gradient(
+        135deg,
+        #14110F 0%,
+        #5a4528 55%,
+        #E8D6B0 100%
+      );
+    filter: saturate(0.85);
+
+    overflow: hidden;
+  }
+
+  /* Vignette overlay — faint inset shadow darkens the edges */
+  .novel-hero__vignette {
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 240px 72px rgba(4, 3, 2, 0.6);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* TINY raincoat-yellow accent — one small warm lit dot.
+     The Raincoat Rule: "a single lit dot, a small mark" — never a fill.
+     Positioned in the mid-right like a lantern glimpsed through rain-blurred glass. */
+  .novel-hero__yellow-dot {
+    position: absolute;
+    top: 38%;
+    right: 28%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-yellow);
+    /* Soft bloom — a warm point of light, not a hard circle */
+    box-shadow:
+      0 0 8px 4px rgba(232, 197, 71, 0.55),
+      0 0 24px 10px rgba(232, 197, 71, 0.18);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .novel-hero__content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: var(--frame);
+    margin-inline: auto;
+    padding-inline: clamp(20px, 5vw, 40px);
+    padding-block-end: clamp(40px, 6vh, 72px);
+  }
+
+  .novel-hero__text {
+    max-width: var(--measure);
+  }
+
+  .novel-hero__launch {
+    font-family: var(--font-sans);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-amber);
+    margin: 0 0 0.6rem;
+  }
+
+  .novel-hero__title {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 430;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-parchment);
+    margin: 0;
+    /* Subtle text-shadow for legibility on the gradient */
+    text-shadow: 0 2px 24px rgba(4, 3, 2, 0.5);
+  }
+
+  /* ── Prose sections ────────────────────────────────────────────── */
+  .novel-prose {
+    max-width: var(--measure);
+  }
+
+  .novel-section-heading {
+    /* Visually hidden — Eyebrow serves as the visible heading */
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .novel-body {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--color-parchment-dim);
+    margin-block: 0.75rem 0;
+  }
+
+  .novel-feeling-text {
+    /* Slightly warmer shade for the feeling/comp paragraph */
+    color: var(--color-parchment);
+  }
+
+  /* ── Atmosphere section ────────────────────────────────────────── */
+  .novel-atmosphere-section {
+    /* No border-top here — AtmosphereStrip has its own hairline */
+    padding-block: 0;
+  }
+
+  /* ── CTA section ───────────────────────────────────────────────── */
+  .novel-cta-inner {
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .novel-world-link {
+    /* Quiet separation from the form */
+    padding-block-start: 0.5rem;
+  }
+
+  /* ── Content note ──────────────────────────────────────────────── */
+  .novel-content-note-section {
+    padding-block: clamp(24px, 3vh, 40px);
+    border-top: 1px solid var(--line);
+  }
+
+  .novel-content-note {
+    font-size: 0.82rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-muted);
+    max-width: var(--measure);
+    margin: 0;
+    font-style: italic;
+  }
+
+  /* ── Mobile 380px ──────────────────────────────────────────────── */
+  @media (max-width: 420px) {
+    .novel-hero {
+      min-height: clamp(340px, 55vh, 480px);
+    }
+
+    .novel-hero__yellow-dot {
+      right: 20%;
+      top: 35%;
+    }
+  }
+</style>

@@ -1,0 +1,256 @@
+---
+/**
+ * writing.astro — /writing page (copy §3)
+ *
+ * Full writing range page with WEIGHTED blocks:
+ *   Fiction (largest) → Screen (smaller) → Other worlds (quiet one-line)
+ *
+ * Mirrors the WritingRange weighting approach and parseLeadWord helper.
+ * Reads the FULLER §3 text from writing.page (not writing.home).
+ *
+ * Rules:
+ *   - NO raincoat-yellow (#E8C547) anywhere on this page (author surface, not novel-specific)
+ *   - NO mid-page LettersForm (footer compact signup covers /writing)
+ *   - NO project titles beyond the novel itself
+ *   - "Other worlds" text already includes the onlywhenitrains.com link — render as <a>
+ *   - Spoiler-safe: no twist, no girl-identity, no cranes-meaning, no "Platform 9"
+ */
+
+import { getEntry } from 'astro:content';
+import { writing } from '../lib/data';
+import { inlineMarkdown } from '../lib/inlineMarkdown';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import Container from '../components/Container.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+const writingPage = await getEntry('pages', 'writing');
+const { title, description } = writingPage.data;
+
+// parseLeadWord — mirrors WritingRange.astro helper.
+// Splits "**Fiction**\nrest of copy" into { lead, body }.
+// The body may contain multi-line text (fiction block has \n after the marker).
+function parseLeadWord(text: string): { lead: string; body: string } {
+  const match = text.match(/^\*\*(.+?)\*\*\s*(.*)/s);
+  if (match && match[1] !== undefined && match[2] !== undefined) {
+    return { lead: match[1], body: match[2].trim() };
+  }
+  return { lead: '', body: text };
+}
+
+const fiction = parseLeadWord(writing.page.fiction);
+const screen = parseLeadWord(writing.page.screen);
+const otherWorlds = parseLeadWord(writing.page.otherWorlds);
+
+// otherWorlds.body: "Interactive and immersive storytelling — where a story
+// becomes a place you can step into. *(See the novel's companion world → onlywhenitrains.com)*"
+// We render the "(See the novel's companion world → onlywhenitrains.com)" part as a link.
+// The italic asterisks are stripped; the URL becomes a proper anchor.
+const OW_LINK_RE = /\*\(See the novel's companion world → (https?:\/\/[^\s)]+)\)\*/;
+const owLinkMatch = otherWorlds.body.match(OW_LINK_RE);
+const owBodyPre = owLinkMatch
+  ? otherWorlds.body.slice(0, owLinkMatch.index).trim()
+  : otherWorlds.body;
+const owLinkUrl = owLinkMatch ? owLinkMatch[1] : 'https://onlywhenitrains.com';
+const owHasLink = !!owLinkMatch;
+---
+
+<BaseLayout title={title} description={description}>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       WRITING HERO — heading + lead (writing.page.heading / .lead)
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="writing-hero" aria-label="The writing">
+    <Container>
+      <div class="writing-hero__inner">
+        <Eyebrow>Writing</Eyebrow>
+        <h1 class="writing-hero__heading">{writing.page.heading}</h1>
+        <p class="writing-hero__lead">{writing.page.lead}</p>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       WEIGHTED BLOCKS — Fiction > Screen > Other worlds
+       Same hierarchy as WritingRange. Fuller §3 text from writing.page.
+       NO raincoat-yellow. NO project titles beyond the novel itself.
+       ═══════════════════════════════════════════════════════════════ -->
+  <Section id="writing-range">
+    <div class="wr-inner">
+
+      <!-- Fiction — large block (heaviest weight; largest type) -->
+      <div class="wr-block wr-block--fiction">
+        <p class="wr-text">
+          <strong class="wr-lead-word wr-lead-word--fiction">{fiction.lead}</strong>
+          {' '}<span set:html={inlineMarkdown(fiction.body)} />
+        </p>
+      </div>
+
+      <!-- Screen — smaller block -->
+      <div class="wr-block wr-block--screen">
+        <p class="wr-text">
+          <strong class="wr-lead-word wr-lead-word--screen">{screen.lead}</strong>
+          {' '}<span set:html={inlineMarkdown(screen.body)} />
+        </p>
+      </div>
+
+      <!-- Other worlds — one quiet line -->
+      <div class="wr-block wr-block--other">
+        <p class="wr-text wr-text--quiet">
+          <strong class="wr-lead-word wr-lead-word--quiet">{otherWorlds.lead}</strong>
+          {' '}{owBodyPre}
+          {owHasLink && (
+            <>
+              {' '}
+              <span class="wr-ow-link-wrap">
+                (See the novel's companion world →{' '}
+                <a
+                  href={owLinkUrl}
+                  class="wr-ow-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  onlywhenitrains.com
+                </a>
+                )
+              </span>
+            </>
+          )}
+        </p>
+      </div>
+
+    </div>
+  </Section>
+
+</BaseLayout>
+
+<style>
+  /* ── Hero ──────────────────────────────────────────────────────── */
+  .writing-hero {
+    padding-block: clamp(72px, 12vh, 140px) clamp(48px, 8vh, 96px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .writing-hero__inner {
+    max-width: var(--measure);
+  }
+
+  .writing-hero__heading {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    font-weight: 430;
+    line-height: 1.08;
+    letter-spacing: -0.022em;
+    color: var(--color-parchment);
+    margin-block: 0.4rem 0.9rem;
+  }
+
+  .writing-hero__lead {
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-parchment-dim);
+    margin: 0;
+  }
+
+  /* ── Writing range blocks (mirrors WritingRange.astro weighting) ── */
+  .wr-inner {
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Shared block structure */
+  .wr-block {
+    padding-block-end: 1.4rem;
+    border-bottom: 1px solid var(--line);
+    margin-block-end: 1.4rem;
+  }
+
+  .wr-block--other {
+    border-bottom: none;
+    margin-block-end: 0;
+    padding-block-end: 0;
+  }
+
+  /* Base paragraph reset */
+  .wr-text {
+    margin: 0;
+  }
+
+  /* Fiction — large (heaviest weight; largest type) */
+  .wr-block--fiction .wr-text {
+    font-size: clamp(1.1rem, 1.8vw, 1.28rem);
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-parchment);
+  }
+
+  .wr-lead-word--fiction {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.2rem, 2vw, 1.45rem);
+    color: var(--color-parchment);
+  }
+
+  /* Screen — smaller block */
+  .wr-block--screen .wr-text {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-parchment-dim);
+  }
+
+  .wr-lead-word--screen {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.08rem;
+    color: var(--color-parchment);
+  }
+
+  /* Other worlds — one quiet line */
+  .wr-text--quiet {
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .wr-lead-word--quiet {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.92rem;
+    color: var(--color-parchment-dim);
+  }
+
+  /* Companion world link */
+  .wr-ow-link-wrap {
+    font-style: italic;
+  }
+
+  .wr-ow-link {
+    color: var(--color-parchment-dim);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(236, 227, 210, 0.3);
+    transition:
+      color var(--t),
+      text-decoration-color var(--t);
+  }
+
+  .wr-ow-link:hover {
+    color: var(--color-amber);
+    text-decoration-color: var(--color-amber);
+  }
+
+  /* ── Mobile 380px ──────────────────────────────────────────────── */
+  @media (max-width: 420px) {
+    .writing-hero__heading {
+      font-size: clamp(1.8rem, 7vw, 2.4rem);
+    }
+  }
+</style>

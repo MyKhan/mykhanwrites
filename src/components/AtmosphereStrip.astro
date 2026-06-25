@@ -1,0 +1,56 @@
+---
+/**
+ * AtmosphereStrip.astro — Quiet evocative fragment row for /novel (§2.4)
+ *
+ * Renders novel.atmosphere (5 fragments) as a calm, surface-only strip.
+ * Surface-only: the girl, the cranes, the notebook appear only as texture —
+ * their meanings are NOT explained. Spoiler-safe.
+ *
+ * Style: muted/small text, calm spacing, hairline separators between items.
+ * Full-bleed width, reading column capped at --frame with normal gutters.
+ */
+
+import { novel } from '../lib/data';
+---
+
+<div class="atm-strip" aria-label="Atmosphere">
+  <ol class="atm-list" role="list">
+    {novel.atmosphere.map((fragment) => (
+      <li class="atm-item">{fragment}</li>
+    ))}
+  </ol>
+</div>
+
+<style>
+  .atm-strip {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding-block: clamp(32px, 5vh, 56px);
+  }
+
+  .atm-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .atm-item {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(0.88rem, 1.2vw, 1rem);
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-muted);
+    letter-spacing: 0.01em;
+    padding-block: clamp(10px, 1.5vh, 16px);
+    border-bottom: 1px solid var(--line);
+    max-width: var(--measure);
+  }
+
+  .atm-item:last-child {
+    border-bottom: none;
+  }
+</style>
