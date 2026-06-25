@@ -1,0 +1,15 @@
+{
+  "published": false,
+  "selectedWorkLabel": "Selected Work",
+  "logline": "[PENDING: logline]",
+  "synopsis": "[PENDING: short synopsis]",
+  "themes": ["[PENDING: theme]"],
+  "comps": ["[PENDING: in the vein of X meets Y]"],
+  "status": "Completed feature — seeking representation",
+  "imdbProUrl": null,
+  "industryContact": {
+    "email": "hello@mykhanwrites.com",
+    "reason": "screen"
+  },
+  "scriptOnRequest": true
+}

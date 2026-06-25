@@ -1,0 +1,77 @@
+{
+  "wordmark": "Meher Yar Khan",
+  "nav": [
+    { "label": "Home", "href": "/" },
+    { "label": "Novel", "href": "/novel/" },
+    { "label": "Writing", "href": "/writing/" },
+    { "label": "About", "href": "/about/" }
+  ],
+  "cta": {
+    "heroPrimary": "Read the first pages",
+    "novelWorld": "Enter the novel world →",
+    "novelWorldUrl": "https://onlywhenitrains.com",
+    "meetAuthor": "Meet the author",
+    "readAboutNovel": "Read about the novel →",
+    "readAboutNovelHref": "/novel/",
+    "seeWriting": "See the writing →",
+    "seeWritingHref": "/writing/",
+    "screenTeaser": "Screen — for industry →",
+    "screenTeaserHref": "/screen/"
+  },
+  "launch": "Coming August 2026.",
+  "letters": {
+    "heading": "Read the first pages of *They Only Came When It Rained*",
+    "body": "I'm finishing my first novel. Subscribe and confirm, and I'll send you the opening pages — then the cover, the launch date, and the occasional letter from the desk where the next stories take shape.",
+    "button": "Send me the first pages",
+    "microcopy": "A few letters a year. No spam. Unsubscribe anytime."
+  },
+  "footer": {
+    "identityLine1": "© Meher Yar Khan · MyKhanWrites.com",
+    "identityLine2": "Fiction · Screen · Other Worlds",
+    "columns": {
+      "read": [
+        { "label": "The novel world", "href": "https://onlywhenitrains.com" },
+        { "label": "Meet the author", "href": "/about/" }
+      ],
+      "elsewhere": [
+        { "label": "Compare My Drafts", "href": "https://comparemydrafts.com" },
+        { "label": "ManTalksMedia", "href": "https://mantalksmedia.com" }
+      ],
+      "follow": [
+        { "label": "Instagram", "handle": "@mykhanwrites", "href": "https://www.instagram.com/mykhanwrites" }
+      ],
+      "contact": "hello@mykhanwrites.com"
+    },
+    "compactSignup": {
+      "lead": "Read the first pages of the novel.",
+      "button": "Send me the first pages",
+      "microcopy": "A few letters a year. No spam. Unsubscribe anytime."
+    }
+  },
+  "socials": {
+    "instagram": "https://www.instagram.com/mykhanwrites",
+    "tiktok": null,
+    "x": null
+  },
+  "contactEmail": "hello@mykhanwrites.com",
+  "contactReasons": [
+    "Reader note",
+    "Publishing / rights",
+    "Film / screen",
+    "Collaboration",
+    "Media / commercial",
+    "Other"
+  ],
+  "states": {
+    "newsletterSuccess": "Check your inbox — the first pages are on their way. (If nothing arrives, peek in spam and add me to your contacts.)",
+    "newsletterError": "That didn't go through. Try again, or email hello@mykhanwrites.com.",
+    "contactSuccess": "Thank you — your note's with me. I read everything, and I'll reply when I can.",
+    "contactError": "Something went wrong sending that. Email hello@mykhanwrites.com and it'll reach me.",
+    "notFound404": "This page took the last train out. Head back home →"
+  },
+  "pending": {
+    "kitPending": "Newsletter signup launching soon — check back shortly.",
+    "web3formsPending": "Contact form launching soon — email hello@mykhanwrites.com in the meantime."
+  },
+  "authorPhotoAlt": "Meher Yar Khan, the author, in soft window light."
+}
