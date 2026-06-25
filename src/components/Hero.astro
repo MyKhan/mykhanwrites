@@ -39,14 +39,14 @@ import QuietLink from './primitives/QuietLink.astro';
     </h1>
 
     <p class="hero-lede">
-      Lonely people, hidden selves, and the places they go to feel less alone.
+      {site.hero.lede}
     </p>
 
     <p class="hero-novel-cue">
-      A first novel — <span class="novel-title">{novel.title}</span> — {novel.launch}.
+      {site.hero.novelCuePrefix}<span class="novel-title">{novel.title}</span>{site.hero.novelCueSuffix}
     </p>
 
-    <p class="hero-range">Across fiction, screen, and other worlds.</p>
+    <p class="hero-range">{site.hero.rangeLine}</p>
 
     <div class="hero-cta-row">
       <PrimaryButton

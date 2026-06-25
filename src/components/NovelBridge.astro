@@ -1,0 +1,156 @@
+---
+/**
+ * NovelBridge.astro — Homepage novel introduction bridge (§1.3)
+ *
+ * Structure:
+ *   <Eyebrow>The first novel</Eyebrow>
+ *   Italic novel title
+ *   novel.premise (one-line)
+ *   novel.launch ("Coming August 2026")
+ *   <ArrowLink href="/novel/">Read about the novel →</ArrowLink>
+ *
+ * Image slot: warm-duotone gradient placeholder (.img-duo)
+ *   background: linear-gradient(135deg, #14110F, #5a4528 55%, #E8D6B0)
+ *   filter: saturate(.85) + grain dust
+ *   NO rain stripes (R2). NO raincoat-yellow (R4).
+ *   alt = novel.novelBridgeAlt
+ *
+ * <!-- RESERVED: cover slot — future book cover (subscriber reward, not shown now) -->
+ */
+
+import { site, novel } from '../lib/data';
+import Section from './Section.astro';
+import Eyebrow from './Eyebrow.astro';
+import ArrowLink from './primitives/ArrowLink.astro';
+---
+
+<Section id="novel-bridge">
+  <div class="nb-grid">
+
+    <!-- Text column -->
+    <div class="nb-text">
+      <Eyebrow>The first novel</Eyebrow>
+
+      <h2 class="nb-title">{novel.title}</h2>
+
+      <p class="nb-premise">{novel.premise}</p>
+
+      <p class="nb-launch">{novel.launch}.</p>
+
+      <ArrowLink href={site.cta.readAboutNovelHref}>
+        {site.cta.readAboutNovel}
+      </ArrowLink>
+    </div>
+
+    <!-- Image column: warm-duotone gradient placeholder -->
+    <!-- RESERVED: replace .nb-img-placeholder with <img> once the book cover is ready -->
+    <div class="nb-image-col">
+      <!--
+        COVER SLOT (reserved — subscriber reward, not yet revealed):
+        When ready, replace .nb-img-placeholder with:
+          <img src={novel.coverSrc} alt={novel.novelBridgeAlt} class="nb-cover-img" />
+        and remove the .nb-img-placeholder element.
+      -->
+      <div class="nb-img-placeholder" role="img" aria-label={novel.novelBridgeAlt}></div>
+    </div>
+
+  </div>
+</Section>
+
+<style>
+  .nb-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(40px, 6vw, 72px);
+    align-items: center;
+  }
+
+  @media (min-width: 820px) {
+    .nb-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* Text column */
+  .nb-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nb-title {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 430;
+    line-height: 1.15;
+    letter-spacing: -0.018em;
+    color: var(--color-parchment);
+    margin: 0;
+    max-width: 20ch;
+  }
+
+  .nb-premise {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-parchment-dim);
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  .nb-launch {
+    font-size: 0.88rem;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+    margin: 0;
+  }
+
+  /* Image column */
+  .nb-image-col {
+    display: flex;
+    align-items: stretch;
+  }
+
+  /*
+   * Warm-duotone gradient placeholder — styleguide .img-duo
+   * background: linear-gradient(135deg, #14110F, #5a4528 55%, #E8D6B0)
+   * filter: saturate(.85)
+   * NO rain stripes (R2), NO raincoat-yellow (R4)
+   */
+  .nb-img-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    max-height: 480px;
+    border-radius: var(--radius-img);
+    background: linear-gradient(135deg, #14110F 0%, #5a4528 55%, #E8D6B0 100%);
+    filter: saturate(0.85);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Grain dust overlay — tonal, pointer-events:none */
+  .nb-img-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    background-repeat: repeat;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Mobile: image comes after text */
+  @media (max-width: 819px) {
+    .nb-image-col {
+      order: -1;
+    }
+
+    .nb-img-placeholder {
+      aspect-ratio: 16 / 9;
+      max-height: 260px;
+    }
+  }
+</style>

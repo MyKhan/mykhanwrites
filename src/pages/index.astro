@@ -21,6 +21,11 @@ import { PRELAUNCH } from '../lib/flags';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ComingSoon from '../components/ComingSoon.astro';
 import Hero from '../components/Hero.astro';
+import NovelBridge from '../components/NovelBridge.astro';
+import LettersForm from '../components/LettersForm.astro';
+import AboutPreview from '../components/AboutPreview.astro';
+import WritingRange from '../components/WritingRange.astro';
+import Section from '../components/Section.astro';
 
 const homePage = await getEntry('pages', 'home');
 const { title, description } = homePage.data;
@@ -42,7 +47,22 @@ const OG_IMAGE = '/og/placeholder-1200x630.png';
   </BaseLayout>
 ) : (
   <BaseLayout title={title} description={description} ogImage={OG_IMAGE}>
-    {/* Phase 6b assembles the full homepage IA here */}
+    {/*
+      Full homepage IA — LOCKED ORDER (R6 — do not reorder):
+        Header (from BaseLayout chrome)
+        Hero
+        NovelBridge
+        LettersForm (full variant, mid-page — peak-interest placement)
+        AboutPreview
+        WritingRange
+        Footer (from BaseLayout chrome, compact signup included)
+    */}
     <Hero />
+    <NovelBridge />
+    <Section>
+      <LettersForm variant="full" />
+    </Section>
+    <AboutPreview />
+    <WritingRange />
   </BaseLayout>
 )}

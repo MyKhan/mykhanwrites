@@ -24,6 +24,7 @@
 import { site } from '../lib/data';
 import Crane from './Crane.astro';
 import { obfuscateEmail, makeMailtoHref } from '../lib/obfuscate';
+import LettersForm from './LettersForm.astro';
 
 interface Props {
   showSignup?: boolean;
@@ -47,15 +48,20 @@ const encodedHref = makeMailtoHref(email);
 <footer
   style="background:var(--color-ink-deep);border-top:1px solid var(--line)"
 >
-  <!-- ── RESERVED SLOT: Phase 6/10 compact signup ───────────────────────────
-       LettersForm (compact variant) goes here once built.
-       Suppressed on /screen route via showSignup prop passed from BaseLayout.
-       Suppressed in minimal mode (coming-soon) — form lives in ComingSoon.astro.
-       To activate: replace this comment block with <LettersForm compact />
-       and gate it with {showSignup && <LettersForm compact />}.
-       ────────────────────────────────────────────────────────────────────── -->
-  {showSignup && !minimal && false && (
-    <slot name="footer-signup" />
+  {/*
+    Compact signup — rendered on every full-footer page EXCEPT /screen.
+    Suppressed in minimal mode (coming-soon) — form lives in ComingSoon.astro.
+    showSignup=false is passed by /screen pages to suppress the reader CTA there
+    (the industry funnel must never carry the reader newsletter call-to-action).
+  */}
+  {showSignup && !minimal && (
+    <div
+      style="border-bottom:1px solid var(--line);padding-block:clamp(48px,7vh,80px)"
+    >
+      <div style="max-width:var(--frame);margin-inline:auto;padding-inline:clamp(20px,5vw,40px)">
+        <LettersForm variant="compact" />
+      </div>
+    </div>
   )}
 
   <!-- Main footer content -->

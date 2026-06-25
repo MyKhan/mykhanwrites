@@ -45,7 +45,7 @@ const formAction = isPending
   : `https://app.kit.com/forms/${KIT_FORM_ID}/subscriptions`;
 ---
 
-<div id="letters" class:list={['letters-form', `letters-form--${variant}`]}>
+<div id={variant === 'full' ? 'letters' : undefined} class:list={['letters-form', `letters-form--${variant}`]}>
   {variant === 'full' ? (
     <>
       <h2 class="letters-heading">

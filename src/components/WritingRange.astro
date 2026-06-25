@@ -1,0 +1,180 @@
+---
+// WritingRange.astro — Homepage writing range (section 1.4 — WEIGHTED, CTA-FREE)
+//
+// Structure:
+//   Eyebrow "The writing"
+//   lead: writing.home.lead
+//   Fiction large block  — writing.home.fiction  (largest type)
+//   Screen smaller block — writing.home.screen   (smaller type)
+//   Other worlds one quiet line — writing.home.otherWorlds (smallest)
+//   ArrowLink "See the writing →"
+//   ScreenTeaser (T30): QuietLink "Screen — for industry →"
+//     Rendered ONLY when SCREEN_PUBLISHED is true (currently false → hidden).
+//
+// Weighting: type scale expresses Fiction > Screen > Other worlds.
+// Bold markers (**Fiction.**/etc.) in stored strings are parsed into
+// { lead, body } — lead word rendered emphasized, no literal asterisks.
+//
+// NO primary button (newsletter is the spine; CTA-free except quiet links).
+
+import { writing, site } from '../lib/data';
+import { SCREEN_PUBLISHED } from '../lib/flags';
+import Section from './Section.astro';
+import Eyebrow from './Eyebrow.astro';
+import ArrowLink from './primitives/ArrowLink.astro';
+import QuietLink from './primitives/QuietLink.astro';
+
+// parseLeadWord — splits "**Fiction.** rest of copy" into { lead, body }.
+// Handles the **bold** markdown marker from JSON data without rendering asterisks.
+function parseLeadWord(text: string): { lead: string; body: string } {
+  const match = text.match(/^\*\*(.+?)\*\*\s*(.*)/s);
+  if (match && match[1] !== undefined && match[2] !== undefined) {
+    return { lead: match[1], body: match[2] };
+  }
+  return { lead: '', body: text };
+}
+
+const fiction = parseLeadWord(writing.home.fiction);
+const screen = parseLeadWord(writing.home.screen);
+const otherWorlds = parseLeadWord(writing.home.otherWorlds);
+---
+
+<Section id="writing-range">
+  <div class="wr-inner">
+    <Eyebrow>The writing</Eyebrow>
+
+    <p class="wr-lead">{writing.home.lead}</p>
+
+    <!-- Fiction — large block (weighted heaviest) -->
+    <div class="wr-block wr-block--fiction">
+      <p class="wr-text">
+        <strong class="wr-lead-word wr-lead-word--fiction">{fiction.lead}</strong>{' '}{fiction.body}
+      </p>
+    </div>
+
+    <!-- Screen — smaller block -->
+    <div class="wr-block wr-block--screen">
+      <p class="wr-text">
+        <strong class="wr-lead-word wr-lead-word--screen">{screen.lead}</strong>{' '}{screen.body}
+      </p>
+    </div>
+
+    <!-- Other worlds — one quiet line (not a card) -->
+    <div class="wr-block wr-block--other">
+      <p class="wr-text wr-text--quiet">
+        <strong class="wr-lead-word wr-lead-word--quiet">{otherWorlds.lead}</strong>{' '}{otherWorlds.body}
+      </p>
+    </div>
+
+    <!-- Footer row: see-writing link + optional ScreenTeaser -->
+    <div class="wr-footer-row">
+      <ArrowLink href={site.cta.seeWritingHref}>
+        {site.cta.seeWriting}
+      </ArrowLink>
+
+      {/*
+        ScreenTeaser (T30) — gated on SCREEN_PUBLISHED.
+        Currently SCREEN_PUBLISHED = false; hidden until /screen ships.
+        When live, set SCREEN_PUBLISHED=true at build time to reveal this link.
+        QuietLink only — must not compete with the newsletter CTA.
+      */}
+      {SCREEN_PUBLISHED && (
+        <QuietLink href={site.cta.screenTeaserHref}>
+          {site.cta.screenTeaser}
+        </QuietLink>
+      )}
+    </div>
+  </div>
+</Section>
+
+<style>
+  .wr-inner {
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .wr-lead {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-parchment-dim);
+    margin-block: 0.75rem 2rem;
+    max-width: var(--measure);
+  }
+
+  /* Shared block structure */
+  .wr-block {
+    padding-block-end: 1.4rem;
+    border-bottom: 1px solid var(--line);
+    margin-block-end: 1.4rem;
+  }
+
+  .wr-block--other {
+    border-bottom: none;
+    margin-block-end: 2rem;
+    padding-block-end: 0;
+  }
+
+  /* Base paragraph reset */
+  .wr-text {
+    margin: 0;
+  }
+
+  /* Fiction — large (heaviest weight; largest type) */
+  .wr-block--fiction .wr-text {
+    font-size: clamp(1.1rem, 1.8vw, 1.28rem);
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-parchment);
+  }
+
+  .wr-lead-word--fiction {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.2rem, 2vw, 1.45rem);
+    color: var(--color-parchment);
+  }
+
+  /* Screen — smaller block */
+  .wr-block--screen .wr-text {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-parchment-dim);
+  }
+
+  .wr-lead-word--screen {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.08rem;
+    color: var(--color-parchment);
+  }
+
+  /* Other worlds — one quiet line */
+  .wr-text--quiet {
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .wr-lead-word--quiet {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.92rem;
+    color: var(--color-parchment-dim);
+  }
+
+  /* Footer row: see-writing + optional screen teaser */
+  .wr-footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(16px, 3vw, 32px);
+  }
+</style>

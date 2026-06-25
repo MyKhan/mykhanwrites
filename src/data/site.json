@@ -76,5 +76,14 @@
   "authorPhotoAlt": "Meher Yar Khan, the author, in soft window light.",
   "comingSoon": {
     "note": "The full site is on its way."
+  },
+  "hero": {
+    "lede": "Lonely people, hidden selves, and the places they go to feel less alone.",
+    "novelCuePrefix": "A first novel — ",
+    "novelCueSuffix": " — coming August 2026.",
+    "rangeLine": "Across fiction, screen, and other worlds."
+  },
+  "aboutPreview": {
+    "teaser": "Meher Yar Khan is a Pakistani-Finnish writer and digital nomad who has been making up stories since he was ten — a different monster on every page. They Only Came When It Rained is his first novel. He also builds writing tools, including Compare My Drafts."
   }
 }

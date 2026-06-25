@@ -1,0 +1,134 @@
+---
+/**
+ * AboutPreview.astro — Homepage author preview (§1.5)
+ *
+ * Structure:
+ *   <Eyebrow>The author</Eyebrow>
+ *   [PENDING] author-photo slot — tonal placeholder block, clearly marked, no broken img
+ *   site.aboutPreview.teaser — verbatim; renders "They Only Came When It Rained" in italic,
+ *     "Compare My Drafts" as an external link (trust fact: ships things).
+ *   <ArrowLink href="/about/">Meet the author →</ArrowLink>
+ *
+ * alt = site.authorPhotoAlt (reserved for when photo arrives)
+ */
+
+import { site } from '../lib/data';
+import Section from './Section.astro';
+import Eyebrow from './Eyebrow.astro';
+import ArrowLink from './primitives/ArrowLink.astro';
+---
+
+<Section id="about-preview">
+  <div class="ap-grid">
+
+    <!-- Photo column: [PENDING] author photo — tonal placeholder, no broken <img> -->
+    <div class="ap-photo-col">
+      <!--
+        PHOTO SLOT [PENDING: window-lit, muted-tone author photo]
+        When ready, replace .ap-photo-placeholder with:
+          <img src="..." alt={site.authorPhotoAlt} class="ap-author-photo" />
+        and remove the .ap-photo-placeholder element.
+      -->
+      <div
+        class="ap-photo-placeholder"
+        role="img"
+        aria-label={site.authorPhotoAlt}
+        title="Author photo — coming soon"
+      >
+        <span class="ap-photo-label" aria-hidden="true">Author photo<br/>pending</span>
+      </div>
+    </div>
+
+    <!-- Text column -->
+    <div class="ap-text">
+      <Eyebrow>The author</Eyebrow>
+
+      <p class="ap-teaser">
+        Meher Yar Khan is a Pakistani-Finnish writer and digital nomad who has been making up
+        stories since he was ten — a different monster on every page.{' '}
+        <em>They Only Came When It Rained</em> is his first novel. He also builds writing tools,
+        including Compare My Drafts.
+      </p>
+
+      <ArrowLink href="/about/">
+        {site.cta.meetAuthor} →
+      </ArrowLink>
+    </div>
+
+  </div>
+</Section>
+
+<style>
+  .ap-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(40px, 6vw, 72px);
+    align-items: center;
+  }
+
+  @media (min-width: 820px) {
+    .ap-grid {
+      grid-template-columns: auto 1fr;
+    }
+  }
+
+  /* Photo column */
+  .ap-photo-col {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  /*
+   * Tonal placeholder — clearly marked [PENDING], no broken <img>.
+   * Uses ink-3 (slightly lighter than ink) with muted border — atmospheric, not distracting.
+   */
+  .ap-photo-placeholder {
+    width: clamp(120px, 20vw, 180px);
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-img);
+    background: var(--color-ink-3);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ap-photo-label {
+    font-size: 0.7rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-align: center;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    line-height: 1.5;
+    opacity: 0.6;
+  }
+
+  /* Text column */
+  .ap-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .ap-teaser {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-parchment-dim);
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  /* Mobile: photo centered above text */
+  @media (max-width: 819px) {
+    .ap-photo-col {
+      justify-content: center;
+    }
+
+    .ap-photo-placeholder {
+      width: clamp(100px, 30vw, 140px);
+    }
+  }
+</style>

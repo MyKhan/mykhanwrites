@@ -73,6 +73,15 @@ const SiteSchema = z.object({
   comingSoon: z.object({
     note: z.string(),
   }),
+  hero: z.object({
+    lede: z.string(),
+    novelCuePrefix: z.string(),
+    novelCueSuffix: z.string(),
+    rangeLine: z.string(),
+  }),
+  aboutPreview: z.object({
+    teaser: z.string(),
+  }),
 });
 
 // ── novel.json ───────────────────────────────────────────────────────────────
