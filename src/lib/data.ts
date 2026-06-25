@@ -137,6 +137,7 @@ const ScreenSchema = z.object({
   themes: z.array(z.string()),
   comps: z.array(z.string()),
   status: z.string(),
+  bio: z.string(),
   imdbProUrl: z.url().nullable(),
   industryContact: z.object({
     email: z.email(),

@@ -1,0 +1,528 @@
+---
+/**
+ * screen/[...slug].astro — /screen industry brochure (GATED, Phase 8)
+ *
+ * THE GATE (C4 — critical requirement):
+ *   `getStaticPaths` returns [] when SCREEN_PUBLISHED is false → dist/screen/ is NOT emitted.
+ *   When SCREEN_PUBLISHED=true, returns [{ params: { slug: undefined } }] → emits /screen/
+ *   (dist/screen/index.html) via the rest-param undefined → index pattern.
+ *
+ * This is the industry-facing brochure — a SEPARATE funnel from the reader newsletter.
+ * NEVER carry reader CTAs on this surface (C3). showFooterSignup={false}.
+ *
+ * Content (Decision A — real specifics are [PENDING] slots in screen.json):
+ *   1. Hero — selectedWorkLabel eyebrow + brochure heading
+ *   2. Logline (screen.logline)
+ *   3. Synopsis (screen.synopsis)
+ *   4. Themes (screen.themes[])
+ *   5. Comparables (screen.comps[])
+ *   6. Status (screen.status)
+ *   7. Novel-first industry bio (spoiler-safe — no twist, no "Platform 9")
+ *   8. IMDbPro slot (only when screen.imdbProUrl is set; omitted while null)
+ *   9. Industry contact → /contact?reason=screen + obfuscated hello@ mailto link
+ *  10. Script on request — no public download link (screen.scriptOnRequest)
+ *
+ * Spoiler audit (T16):
+ *   Logline/synopsis/themes/comps are [PENDING] placeholders — no twist content present.
+ *   Bio and structural copy are spoiler-safe: no cranes' meaning, no girl's identity,
+ *   no ending mechanics, no "Platform 9" / "Platform Nine".
+ *   Duality theme is named at high level only ("two selves, two paths") — no plot mechanics.
+ *
+ * NEEDS MEHER before un-gating:
+ *   - US Copyright registration filed (hard gate, C4)
+ *   - Fill screen.json: logline / synopsis / themes / comps / title hint
+ *   - IMDbPro URL (set screen.imdbProUrl when available)
+ */
+
+import { getEntry } from 'astro:content';
+import { screen } from '../../lib/data';
+import { SCREEN_PUBLISHED } from '../../lib/flags';
+import { obfuscateEmail, makeMailtoHref } from '../../lib/obfuscate';
+import { inlineMarkdown } from '../../lib/inlineMarkdown';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/Section.astro';
+import Container from '../../components/Container.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import ArrowLink from '../../components/primitives/ArrowLink.astro';
+
+// ── GATE: Conditional emission (C4) ────────────────────────────────────────
+// Returning [] prevents Astro from emitting this route at build time.
+// { slug: undefined } on a [...slug] rest-route maps to /screen/ (index).
+export function getStaticPaths() {
+  if (!SCREEN_PUBLISHED) return [];
+  return [{ params: { slug: undefined } }];
+}
+
+// Page metadata from content collection (screen.md frontmatter)
+const screenPage = await getEntry('pages', 'screen');
+const { title, description } = screenPage.data;
+
+// Obfuscated industry contact email (C3 — raw address must not appear in HTML)
+const encodedEmail = obfuscateEmail(screen.industryContact.email);
+const mailtoHref = makeMailtoHref(screen.industryContact.email);
+
+// Contact link pre-selects "Film / screen" in the ContactForm reason dropdown
+const contactHref = `/contact?reason=${encodeURIComponent(screen.industryContact.reason)}`;
+
+// [PENDING] detection helper — muted label for placeholder copy
+function isPending(value: string): boolean {
+  return value.includes('[PENDING');
+}
+---
+
+<!--
+  showFooterSignup={false} — this is the industry funnel; reader signup must NEVER appear (C3).
+  noindex is automatic — indexable when SCREEN_PUBLISHED=true (page emits); noindex while gated (page doesn't emit anyway). No manual action needed.
+-->
+<BaseLayout
+  title={title}
+  description={description}
+  showFooterSignup={false}
+  noindex={!SCREEN_PUBLISHED}
+>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       1. HERO — selectedWorkLabel eyebrow + industry-facing heading
+          "Selected Work" frames this as a portfolio brochure.
+          No project title needed (T31) — logline is the hook.
+  ═══════════════════════════════════════════════════════════════ -->
+  <section class="screen-hero">
+    <Container>
+      <Eyebrow tone="eyebrow">{screen.selectedWorkLabel}</Eyebrow>
+      <h1 class="screen-hero__heading">For industry</h1>
+      <p class="screen-hero__subhead">
+        A completed feature screenplay — available on request.
+      </p>
+    </Container>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       2. LOGLINE
+          Renders the [PENDING] placeholder visually marked as pending
+          so an un-gate without real copy is immediately obvious.
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="screen-logline">
+    <div class="screen-prose">
+      <Eyebrow>Logline</Eyebrow>
+      <h2 class="screen-section-heading sr-only">Logline</h2>
+      {isPending(screen.logline) ? (
+        <p class="screen-body screen-pending" aria-label="Logline pending">
+          <span class="screen-pending__label" aria-hidden="true">[pending]</span>
+          {' '}Logline will appear here once copyright registration is filed.
+        </p>
+      ) : (
+        <p class="screen-body screen-logline" set:html={inlineMarkdown(screen.logline)} />
+      )}
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       3. SYNOPSIS
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="screen-synopsis">
+    <div class="screen-prose">
+      <Eyebrow>Synopsis</Eyebrow>
+      <h2 class="screen-section-heading sr-only">Synopsis</h2>
+      {isPending(screen.synopsis) ? (
+        <p class="screen-body screen-pending" aria-label="Synopsis pending">
+          <span class="screen-pending__label" aria-hidden="true">[pending]</span>
+          {' '}Short synopsis will appear here once copyright registration is filed.
+        </p>
+      ) : (
+        <p class="screen-body" set:html={inlineMarkdown(screen.synopsis)} />
+      )}
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       4. THEMES
+          Spoiler audit (T16): [PENDING] placeholder carries no twist content.
+          When Meher fills themes[], keep to high-level thematic territory only —
+          duality is fine ("two selves, two paths"); NO plot mechanics that decode
+          the novel's twist (cranes, girl's identity, ending, Platform 9).
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="screen-themes">
+    <div class="screen-prose">
+      <Eyebrow>Themes</Eyebrow>
+      <h2 class="screen-section-heading sr-only">Themes</h2>
+      {screen.themes.every(isPending) ? (
+        <p class="screen-body screen-pending" aria-label="Themes pending">
+          <span class="screen-pending__label" aria-hidden="true">[pending]</span>
+          {' '}Themes will appear here once copyright registration is filed.
+        </p>
+      ) : (
+        <ul class="screen-themes-list">
+          {screen.themes.map((theme) => (
+            <li class="screen-themes-list__item" set:html={inlineMarkdown(theme)} />
+          ))}
+        </ul>
+      )}
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       5. COMPARABLES — "in the vein of X meets Y"
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="screen-comps">
+    <div class="screen-prose">
+      <Eyebrow>In the vein of</Eyebrow>
+      <h2 class="screen-section-heading sr-only">Comparables</h2>
+      {screen.comps.every(isPending) ? (
+        <p class="screen-body screen-pending" aria-label="Comparables pending">
+          <span class="screen-pending__label" aria-hidden="true">[pending]</span>
+          {' '}Comparables will appear here once copyright registration is filed.
+        </p>
+      ) : (
+        <ul class="screen-comps-list">
+          {screen.comps.map((comp) => (
+            <li class="screen-comps-list__item" set:html={inlineMarkdown(comp)} />
+          ))}
+        </ul>
+      )}
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       6. STATUS
+          screen.status is NOT pending — "Completed feature — seeking representation"
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="screen-status">
+    <div class="screen-prose">
+      <Eyebrow>Status</Eyebrow>
+      <h2 class="screen-section-heading sr-only">Status</h2>
+      <p class="screen-body screen-status-text">{screen.status}</p>
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       7. NOVEL-FIRST INDUSTRY BIO (spoiler-safe)
+          Opens with the novel credential — the novel is the trust badge for the screenplay.
+          NO twist, NO cranes' meaning, NO girl's identity, NO ending, NO "Platform 9".
+          Duality named at high level only.
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="screen-bio">
+    <div class="screen-prose">
+      <Eyebrow>About the writer</Eyebrow>
+      <h2 class="screen-section-heading sr-only">About the writer</h2>
+      <div class="screen-bio-text">
+        <p class="screen-body" set:html={inlineMarkdown(screen.bio)} />
+      </div>
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       8. IMDBPRO LINK SLOT
+          Rendered ONLY when screen.imdbProUrl is set (non-null).
+          Currently null — slot is omitted.
+          When available: Meher sets imdbProUrl in screen.json and re-builds.
+  ═══════════════════════════════════════════════════════════════ -->
+  {screen.imdbProUrl && (
+    <Section id="screen-imdb">
+      <div class="screen-prose">
+        <Eyebrow>IMDbPro</Eyebrow>
+        <h2 class="screen-section-heading sr-only">IMDbPro</h2>
+        <p class="screen-body">
+          <a
+            href={screen.imdbProUrl}
+            class="screen-imdb-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View on IMDbPro →
+          </a>
+        </p>
+      </div>
+    </Section>
+  )}
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       9. SCRIPT ON REQUEST + INDUSTRY CONTACT (C3 — no reader CTA)
+          screen.scriptOnRequest = true → state it; NO download link.
+          Two contact paths:
+            a) /contact?reason=screen — form route, pre-selects "Film / screen"
+            b) Obfuscated hello@ mailto — raw address NOT in HTML (obfuscate.ts)
+          The Web3Forms reason field differentiates industry mail (T24).
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="screen-contact">
+    <div class="screen-prose">
+      <Eyebrow>Get in touch</Eyebrow>
+      <h2 class="screen-section-heading sr-only">Industry contact</h2>
+
+      {screen.scriptOnRequest && (
+        <p class="screen-script-note">
+          Script available on request — reach out via the form or email below.
+        </p>
+      )}
+
+      <div class="screen-contact-actions">
+        <ArrowLink href={contactHref}>
+          Send an industry enquiry →
+        </ArrowLink>
+
+        <p class="screen-contact-email-label">
+          Or write directly:{' '}
+          <a
+            href={mailtoHref}
+            set:html={encodedEmail}
+            class="screen-contact-email"
+            aria-label="Email hello at mykhanwrites dot com"
+          />
+        </p>
+      </div>
+    </div>
+  </Section>
+
+</BaseLayout>
+
+<style>
+  /* ── Screen-only helper ────────────────────────────────────────── */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* ── Hero ──────────────────────────────────────────────────────── */
+  .screen-hero {
+    padding-block: clamp(64px, 9vh, 120px) clamp(32px, 4vh, 56px);
+  }
+
+  .screen-hero__heading {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 430;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-parchment);
+    margin: 0.5rem 0 0.4rem;
+  }
+
+  .screen-hero__subhead {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-parchment-dim);
+    margin: 0;
+  }
+
+  /* ── Shared prose wrapper ──────────────────────────────────────── */
+  .screen-prose {
+    max-width: var(--measure);
+  }
+
+  .screen-section-heading {
+    /* Visually hidden — Eyebrow serves as the visible heading */
+  }
+
+  /* ── Body text ─────────────────────────────────────────────────── */
+  .screen-body {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--color-parchment-dim);
+    margin-block: 0.75rem 0;
+  }
+
+  .screen-logline {
+    font-size: clamp(1rem, 1.4vw, 1.12rem);
+    line-height: 1.65;
+    color: var(--color-parchment);
+    font-weight: 300;
+  }
+
+  /* ── Pending placeholder ───────────────────────────────────────── */
+  .screen-pending {
+    color: var(--color-muted);
+    font-style: italic;
+  }
+
+  .screen-pending__label {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    border: 1px solid rgba(154, 139, 122, 0.3);
+    border-radius: 2px;
+    padding: 1px 5px;
+    margin-right: 0.3em;
+    vertical-align: middle;
+  }
+
+  /* ── Themes list ───────────────────────────────────────────────── */
+  .screen-themes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .screen-themes-list__item {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-parchment-dim);
+    padding-left: 1.1em;
+    position: relative;
+  }
+
+  .screen-themes-list__item::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--color-amber);
+    font-weight: 400;
+  }
+
+  /* ── Comps list ────────────────────────────────────────────────── */
+  .screen-comps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .screen-comps-list__item {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-parchment-dim);
+    font-style: italic;
+    padding-left: 1.1em;
+    position: relative;
+  }
+
+  .screen-comps-list__item::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--color-amber);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  /* ── Status ────────────────────────────────────────────────────── */
+  .screen-status-text {
+    color: var(--color-parchment);
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  /* ── Bio ───────────────────────────────────────────────────────── */
+  .screen-bio-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .screen-bio-text .screen-body {
+    margin-block: 0;
+  }
+
+  .screen-bio-link {
+    color: var(--color-parchment);
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    padding-bottom: 1px;
+    transition:
+      color var(--t),
+      border-color var(--t);
+  }
+
+  .screen-bio-link:hover {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+
+  .screen-bio-link:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+
+  /* ── IMDbPro link ──────────────────────────────────────────────── */
+  .screen-imdb-link {
+    font-size: 0.9rem;
+    color: var(--color-parchment);
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    padding-bottom: 3px;
+    transition:
+      color var(--t),
+      border-color var(--t);
+  }
+
+  .screen-imdb-link:hover {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+
+  .screen-imdb-link:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+
+  /* ── Script note ───────────────────────────────────────────────── */
+  .screen-script-note {
+    font-size: 0.92rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-parchment-dim);
+    font-style: italic;
+    margin-block: 0 1.5rem;
+  }
+
+  /* ── Contact actions ───────────────────────────────────────────── */
+  .screen-contact-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .screen-contact-email-label {
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--color-parchment-dim);
+    margin: 0;
+  }
+
+  .screen-contact-email {
+    color: var(--color-parchment);
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    padding-bottom: 1px;
+    transition:
+      color var(--t),
+      border-color var(--t);
+  }
+
+  .screen-contact-email:hover {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+
+  .screen-contact-email:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+
+  /* ── Mobile 380px ──────────────────────────────────────────────── */
+  @media (max-width: 420px) {
+    .screen-hero__heading {
+      font-size: clamp(2rem, 8vw, 2.8rem);
+    }
+  }
+</style>
