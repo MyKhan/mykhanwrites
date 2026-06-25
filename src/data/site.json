@@ -73,5 +73,8 @@
     "kitPending": "Newsletter signup launching soon — check back shortly.",
     "web3formsPending": "Contact form launching soon — email hello@mykhanwrites.com in the meantime."
   },
-  "authorPhotoAlt": "Meher Yar Khan, the author, in soft window light."
+  "authorPhotoAlt": "Meher Yar Khan, the author, in soft window light.",
+  "comingSoon": {
+    "note": "The full site is on its way."
+  }
 }

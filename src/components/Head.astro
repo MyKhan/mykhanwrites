@@ -3,7 +3,8 @@
  * Head.astro — <head> contents for every page
  *
  * Emits: charset, viewport, title, meta description, font preload <link>,
- * favicon <link>, and a <slot/> for per-page extra head tags.
+ * favicon <link>, minimal OG + Twitter share meta, optional noindex, and a
+ * <slot/> for per-page extra head tags.
  *
  * Font preload (Phase 2 handoff, T13):
  *   Imports frauncesRomanLatinUrl from ../lib/fonts and emits exactly one
@@ -11,18 +12,25 @@
  *   for the critical Fraunces roman latin variable font.
  *   Only the roman (upright) face — do NOT preload italic (not render-blocking).
  *
- * NOTE — items deferred to Phase 11 (seo.ts / jsonld.ts):
+ * Share meta (M1 minimal subset — full seo.ts / JSON-LD deferred to Phase 11):
+ *   og:title, og:description, og:type (website), og:url (siteUrl + pathname),
+ *   og:image, og:image:width/height (1200/630), twitter:card, twitter:image.
+ *   When ogImage is omitted the OG stub placeholder is used as default.
+ *
+ * noindex (M1 prelaunch belt-and-suspenders):
+ *   When noindex=true, emits <meta name="robots" content="noindex,nofollow">.
+ *   At launch (PRELAUNCH=false) the noindex prop is omitted → tag absent.
+ *
+ * NOTE — items still deferred to Phase 11 (seo.ts / jsonld.ts):
  *   - Canonical URL <link>
- *   - Open Graph meta tags (og:title, og:description, og:image)
- *   - Twitter card meta tags
  *   - Sitemap <link>
  *   - JSON-LD structured data
- *   Do NOT build those here.
  *
  * Props:
  *   title       — <title> text (required)
  *   description — meta description (required)
- *   ogImage     — reserved for Phase 11 OG image; accepted but not yet emitted
+ *   ogImage     — OG image URL; defaults to /og/placeholder-1200x630.png
+ *   noindex     — when true, emits noindex,nofollow robots meta (default: false)
  */
 
 import { frauncesRomanLatinUrl } from '../lib/fonts';
@@ -32,9 +40,20 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, ogImage, noindex = false } = Astro.props;
+
+const OG_DEFAULT = '/og/placeholder-1200x630.png';
+const resolvedOgImage = ogImage ?? OG_DEFAULT;
+
+// Derive base URL from Astro.site (astro.config.mjs => https://www.mykhanwrites.com)
+const siteUrl = Astro.site ? Astro.site.origin : 'https://www.mykhanwrites.com';
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+const absoluteOgImage = resolvedOgImage.startsWith('http')
+  ? resolvedOgImage
+  : new URL(resolvedOgImage, siteUrl).href;
 ---
 
 <meta charset="UTF-8" />
@@ -42,11 +61,27 @@ const { title, description } = Astro.props;
 <title>{title}</title>
 <meta name="description" content={description} />
 
+<!-- Prelaunch noindex (belt-and-suspenders with M1b robots.txt) -->
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+
 <!-- Critical font preload: Fraunces roman latin variable subset (Phase 2 handoff T13) -->
 <link rel="preload" as="font" type="font/woff2" crossorigin href={frauncesRomanLatinUrl} />
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-<!-- Per-page extra head tags (canonical, OG, JSON-LD added in Phase 11) -->
+<!-- Open Graph share meta (M1 minimal set; full seo.ts in Phase 11) -->
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={absoluteOgImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content={absoluteOgImage} />
+
+<!-- Per-page extra head tags (canonical, JSON-LD added in Phase 11) -->
 <slot />

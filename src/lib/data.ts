@@ -70,6 +70,9 @@ const SiteSchema = z.object({
     web3formsPending: z.string(),
   }),
   authorPhotoAlt: z.string(),
+  comingSoon: z.object({
+    note: z.string(),
+  }),
 });
 
 // ── novel.json ───────────────────────────────────────────────────────────────

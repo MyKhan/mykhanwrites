@@ -27,9 +27,11 @@ import { obfuscateEmail, makeMailtoHref } from '../lib/obfuscate';
 
 interface Props {
   showSignup?: boolean;
+  /** When true, render only the identity lockup + crane — no columns, no socials, no compact signup. */
+  minimal?: boolean;
 }
 
-const { showSignup = true } = Astro.props;
+const { showSignup = true, minimal = false } = Astro.props;
 
 const columns = site.footer.columns;
 const email = site.contactEmail;
@@ -48,10 +50,11 @@ const encodedHref = makeMailtoHref(email);
   <!-- ── RESERVED SLOT: Phase 6/10 compact signup ───────────────────────────
        LettersForm (compact variant) goes here once built.
        Suppressed on /screen route via showSignup prop passed from BaseLayout.
+       Suppressed in minimal mode (coming-soon) — form lives in ComingSoon.astro.
        To activate: replace this comment block with <LettersForm compact />
        and gate it with {showSignup && <LettersForm compact />}.
        ────────────────────────────────────────────────────────────────────── -->
-  {showSignup && false && (
+  {showSignup && !minimal && false && (
     <slot name="footer-signup" />
   )}
 
@@ -59,103 +62,104 @@ const encodedHref = makeMailtoHref(email);
   <div
     style="max-width:var(--frame);margin-inline:auto;padding-inline:clamp(20px,5vw,40px);padding-block:clamp(48px,8vh,80px)"
   >
-    <div class="footer-grid">
-
-      <!-- Identity lockup + Crane -->
+    {minimal ? (
       <div class="footer-identity">
         <Crane size={40} class="footer-crane" />
-        <!-- Two-line identity (T21) — rendered as two lines, not a run-on -->
         <p class="identity-line">{site.footer.identityLine1}</p>
         <p class="identity-line identity-line--dim">{site.footer.identityLine2}</p>
       </div>
+    ) : (
+      <div class="footer-grid">
 
-      <!-- Column: Read -->
-      <div class="footer-col">
-        <p class="col-heading">Read</p>
-        <ul role="list" class="col-list">
-          {columns.read.map((item) => (
+        <!-- Identity lockup + Crane (two-line identity T21) -->
+        <div class="footer-identity">
+          <Crane size={40} class="footer-crane" />
+          <p class="identity-line">{site.footer.identityLine1}</p>
+          <p class="identity-line identity-line--dim">{site.footer.identityLine2}</p>
+        </div>
+
+        <!-- Column: Read -->
+        <div class="footer-col">
+          <p class="col-heading">Read</p>
+          <ul role="list" class="col-list">
+            {columns.read.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="footer-link"
+                  target={item.href.startsWith('http') ? '_blank' : undefined}
+                  rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Column: Elsewhere -->
+        <div class="footer-col">
+          <p class="col-heading">Elsewhere</p>
+          <ul role="list" class="col-list">
+            {columns.elsewhere.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="footer-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Column: Follow -->
+        <div class="footer-col">
+          <p class="col-heading">Follow</p>
+          <ul role="list" class="col-list">
+            {columns.follow.map((social) => (
+              <li>
+                <a
+                  href={social.href}
+                  class="footer-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {social.label} <span class="handle">{social.handle}</span>
+                </a>
+              </li>
+            ))}
+            {/* TikTok — null in site.socials; reserved, not yet linked */}
+            {site.socials.tiktok === null && (
+              <li><span class="footer-reserved">TikTok — coming soon</span></li>
+            )}
+            {/* X / Twitter — null in site.socials; reserved, not yet linked */}
+            {site.socials.x === null && (
+              <li><span class="footer-reserved">X — coming soon</span></li>
+            )}
+          </ul>
+        </div>
+
+        <!-- Column: Contact -->
+        <!-- Email obfuscation: set:html renders entity-encoded string; no plaintext in HTML -->
+        <div class="footer-col">
+          <p class="col-heading">Contact</p>
+          <ul role="list" class="col-list">
             <li>
               <a
-                href={item.href}
+                href={encodedHref}
                 class="footer-link"
-                target={item.href.startsWith('http') ? '_blank' : undefined}
-                rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              >
-                {item.label}
-              </a>
+                set:html={encodedEmail}
+              />
             </li>
-          ))}
-        </ul>
-      </div>
+          </ul>
+        </div>
 
-      <!-- Column: Elsewhere -->
-      <div class="footer-col">
-        <p class="col-heading">Elsewhere</p>
-        <ul role="list" class="col-list">
-          {columns.elsewhere.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class="footer-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
       </div>
-
-      <!-- Column: Follow -->
-      <div class="footer-col">
-        <p class="col-heading">Follow</p>
-        <ul role="list" class="col-list">
-          {columns.follow.map((social) => (
-            <li>
-              <a
-                href={social.href}
-                class="footer-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {social.label} <span class="handle">{social.handle}</span>
-              </a>
-            </li>
-          ))}
-          {/* TikTok — null in site.socials; reserved, not yet linked.
-              Do NOT emit a dead <a> tag. */}
-          {site.socials.tiktok === null && (
-            <li><span class="footer-reserved">TikTok — coming soon</span></li>
-          )}
-          {/* X / Twitter — null in site.socials; reserved, not yet linked. */}
-          {site.socials.x === null && (
-            <li><span class="footer-reserved">X — coming soon</span></li>
-          )}
-        </ul>
-      </div>
-
-      <!-- Column: Contact -->
-      <div class="footer-col">
-        <p class="col-heading">Contact</p>
-        <ul role="list" class="col-list">
-          <li>
-            <!--
-              Email obfuscation: set:html renders the entity-encoded string in the browser.
-              No plaintext email address appears in the built HTML source.
-              The href is also entity-encoded. Real users see/click a normal mailto link.
-              Screen readers read the decoded text correctly.
-            -->
-            <a
-              href={encodedHref}
-              class="footer-link"
-              set:html={encodedEmail}
-            />
-          </li>
-        </ul>
-      </div>
-
-    </div>
+    )}
   </div>
 </footer>
 

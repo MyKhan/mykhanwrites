@@ -31,8 +31,11 @@
  * Props:
  *   title            — passed to Head (required)
  *   description      — passed to Head (required)
- *   ogImage?         — passed to Head (reserved for Phase 11)
+ *   ogImage?         — passed to Head; emitted as OG image meta
  *   showFooterSignup — passed to Footer; reserved for Phase 6/10 compact signup (default: true)
+ *   minimal          — when true, Header renders wordmark only + Footer renders identity only.
+ *                      Used by the coming-soon page. Default false (full chrome everywhere else).
+ *   noindex          — when true, emits <meta name="robots" content="noindex,nofollow">
  */
 
 import { ClientRouter } from 'astro:transitions';
@@ -46,6 +49,8 @@ interface Props {
   description: string;
   ogImage?: string;
   showFooterSignup?: boolean;
+  minimal?: boolean;
+  noindex?: boolean;
 }
 
 const {
@@ -53,6 +58,8 @@ const {
   description,
   ogImage,
   showFooterSignup = true,
+  minimal = false,
+  noindex = false,
 } = Astro.props;
 
 // Umami analytics: render only when env var is present (cookieless, no banner needed)
@@ -61,7 +68,12 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
 
 <html lang="en">
   <head>
-    <Head title={title} description={description} {...(ogImage ? { ogImage } : {})} />
+    <Head
+      title={title}
+      description={description}
+      {...(ogImage ? { ogImage } : {})}
+      noindex={noindex}
+    />
     <!-- View Transitions / SPA navigation (astro:transitions) -->
     <ClientRouter />
     <!-- Per-page extra head tags (canonical, OG, JSON-LD — Phase 11) -->
@@ -69,13 +81,13 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
   </head>
 
   <body>
-    <Header />
+    <Header minimal={minimal} />
 
     <main>
       <slot />
     </main>
 
-    <Footer showSignup={showFooterSignup} />
+    <Footer showSignup={showFooterSignup} minimal={minimal} />
 
     <!-- Film-grain overlay (fixed, z-index:60, pointer-events:none) -->
     <Grain />

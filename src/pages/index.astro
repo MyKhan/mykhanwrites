@@ -1,25 +1,48 @@
 ---
 /**
- * index.astro — Homepage (Phase 6a: Hero + LettersForm)
+ * index.astro — Homepage
  *
- * Renders the locked Hero and Kit-wired LettersForm for M1 verification.
- * Full homepage IA (NovelBridge, AboutPreview, WritingRange) comes in Phase 6b.
- * BaseLayout wiring (Header/Footer/Grain/ClientRouter) stays intact.
+ * Branches on the PRELAUNCH build flag:
+ *
+ *   PRELAUNCH === true  (default, safe pre-launch state)
+ *     → <BaseLayout minimal noindex> wrapping <ComingSoon />
+ *       • minimal chrome: wordmark-only header, identity-only footer
+ *       • noindex: emits <meta name="robots" content="noindex,nofollow">
+ *       • ComingSoon: Hero + LettersForm (full variant) + "full site on its way" note
+ *
+ *   PRELAUNCH === false (set explicitly at build time for the live site)
+ *     → Full homepage (assembled in Phase 6b).
+ *       Stand-in here so PRELAUNCH=false builds compile cleanly.
+ *       Phase 6b replaces the stand-in with the full IA.
  */
 
 import { getEntry } from 'astro:content';
+import { PRELAUNCH } from '../lib/flags';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ComingSoon from '../components/ComingSoon.astro';
 import Hero from '../components/Hero.astro';
-import LettersForm from '../components/LettersForm.astro';
-import Section from '../components/Section.astro';
 
 const homePage = await getEntry('pages', 'home');
 const { title, description } = homePage.data;
+
+// OG image for the coming-soon share surface
+const OG_IMAGE = '/og/placeholder-1200x630.png';
 ---
 
-<BaseLayout title={title} description={description}>
-  <Hero />
-  <Section>
-    <LettersForm variant="full" />
-  </Section>
-</BaseLayout>
+{PRELAUNCH ? (
+  <BaseLayout
+    title={title}
+    description={description}
+    ogImage={OG_IMAGE}
+    minimal
+    noindex
+    showFooterSignup={false}
+  >
+    <ComingSoon />
+  </BaseLayout>
+) : (
+  <BaseLayout title={title} description={description} ogImage={OG_IMAGE}>
+    {/* Phase 6b assembles the full homepage IA here */}
+    <Hero />
+  </BaseLayout>
+)}

@@ -22,6 +22,13 @@
 
 import { site } from '../lib/data';
 
+type Props = {
+  /** When true, render wordmark only — no nav links, no mobile toggle. */
+  minimal?: boolean;
+};
+
+const { minimal = false } = Astro.props as Props;
+
 const pathname = Astro.url.pathname;
 
 function isActive(href: string): boolean {
@@ -45,83 +52,85 @@ function isActive(href: string): boolean {
       {site.wordmark}
     </a>
 
-    <!-- Desktop nav -->
-    <nav aria-label="Primary navigation">
-      <ul
-        id="primary-nav"
-        role="list"
-        style="display:flex;gap:clamp(20px,3vw,36px);list-style:none;margin:0;padding:0"
-      >
-        {
-          site.nav.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                aria-current={isActive(item.href) ? 'page' : undefined}
-                class="nav-link"
-                style="position:relative;font-size:.82rem;letter-spacing:.13em;text-transform:uppercase;color:var(--color-parchment);text-decoration:none;padding-block:4px"
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
+    {!minimal && (
+      <>
+        <nav aria-label="Primary navigation">
+          <ul
+            id="primary-nav"
+            role="list"
+            style="display:flex;gap:clamp(20px,3vw,36px);list-style:none;margin:0;padding:0"
+          >
+            {
+              site.nav.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    aria-current={isActive(item.href) ? 'page' : undefined}
+                    class="nav-link"
+                    style="position:relative;font-size:.82rem;letter-spacing:.13em;text-transform:uppercase;color:var(--color-parchment);text-decoration:none;padding-block:4px"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
 
-    <!-- Mobile menu toggle (visible below sm breakpoint) -->
-    <button
-      id="mobile-nav-toggle"
-      aria-controls="mobile-nav"
-      aria-expanded="false"
-      aria-label="Open navigation menu"
-      style="display:none;background:none;border:none;color:var(--color-parchment);cursor:pointer;padding:10px;min-width:44px;min-height:44px;align-items:center;justify-content:center"
+        <button
+          id="mobile-nav-toggle"
+          aria-controls="mobile-nav"
+          aria-expanded="false"
+          aria-label="Open navigation menu"
+          style="display:none;background:none;border:none;color:var(--color-parchment);cursor:pointer;padding:10px;min-width:44px;min-height:44px;align-items:center;justify-content:center"
+        >
+          <svg
+            width="22"
+            height="16"
+            viewBox="0 0 22 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <line x1="0" y1="2" x2="22" y2="2" />
+            <line x1="0" y1="8" x2="22" y2="8" />
+            <line x1="0" y1="14" x2="22" y2="14" />
+          </svg>
+        </button>
+      </>
+    )}
+  </div>
+
+  {!minimal && (
+    <div
+      id="mobile-nav"
+      aria-hidden="true"
+      style="display:none;border-top:1px solid var(--line);background:rgba(20,17,15,.96);backdrop-filter:blur(10px)"
     >
-      <!-- Hamburger icon -->
-      <svg
-        width="22"
-        height="16"
-        viewBox="0 0 22 16"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        <line x1="0" y1="2" x2="22" y2="2" />
-        <line x1="0" y1="8" x2="22" y2="8" />
-        <line x1="0" y1="14" x2="22" y2="14" />
-      </svg>
-    </button>
-  </div>
-
-  <!-- Mobile nav drawer -->
-  <div
-    id="mobile-nav"
-    aria-hidden="true"
-    style="display:none;border-top:1px solid var(--line);background:rgba(20,17,15,.96);backdrop-filter:blur(10px)"
-  >
-    <nav aria-label="Mobile navigation">
-      <ul
-        role="list"
-        style="max-width:var(--frame);margin-inline:auto;padding:16px clamp(20px,5vw,40px) 24px;list-style:none;display:flex;flex-direction:column;gap:0"
-      >
-        {
-          site.nav.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                aria-current={isActive(item.href) ? 'page' : undefined}
-                style="display:block;padding:14px 0;font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;color:var(--color-parchment);text-decoration:none;border-bottom:1px solid var(--line)"
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-  </div>
+      <nav aria-label="Mobile navigation">
+        <ul
+          role="list"
+          style="max-width:var(--frame);margin-inline:auto;padding:16px clamp(20px,5vw,40px) 24px;list-style:none;display:flex;flex-direction:column;gap:0"
+        >
+          {
+            site.nav.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                  style="display:block;padding:14px 0;font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;color:var(--color-parchment);text-decoration:none;border-bottom:1px solid var(--line)"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+  )}
 </header>
 
 <style>
@@ -170,78 +179,82 @@ function isActive(href: string): boolean {
   /* Reduced-motion: underline appears instantly (global.css collapses transitions) */
 </style>
 
-<script>
-  /**
-   * Mobile nav toggle — bound on astro:page-load (View Transitions lifecycle).
-   *
-   * astro:page-load fires on BOTH initial load AND after every View Transitions
-   * navigation. Binding here (not in a bare inline script) ensures the toggle
-   * re-initialises after each SPA navigation — critical with <ClientRouter />.
-   *
-   * Behaviour:
-   *   - Toggles aria-expanded on the button and aria-hidden on the drawer
-   *   - Updates aria-label for screen readers
-   *   - Closes nav on Escape key (single document-level handler, registered once)
-   *   - Auto-closes on any nav-link click (navigation is imminent)
-   *
-   * Keydown handler strategy: registered ONCE per session (guarded by a flag).
-   * The handler queries the live DOM at event time so it always operates on the
-   * CURRENT page's toggle — never a detached node from a previous navigation.
-   */
+{!minimal && (
+  <script>
+    /**
+     * Mobile nav toggle — bound on astro:page-load (View Transitions lifecycle).
+     *
+     * astro:page-load fires on BOTH initial load AND after every View Transitions
+     * navigation. Binding here (not in a bare inline script) ensures the toggle
+     * re-initialises after each SPA navigation — critical with <ClientRouter />.
+     *
+     * Behaviour:
+     *   - Toggles aria-expanded on the button and aria-hidden on the drawer
+     *   - Updates aria-label for screen readers
+     *   - Closes nav on Escape key (single document-level handler, registered once)
+     *   - Auto-closes on any nav-link click (navigation is imminent)
+     *
+     * Keydown handler strategy: registered ONCE per session (guarded by a flag).
+     * The handler queries the live DOM at event time so it always operates on the
+     * CURRENT page's toggle — never a detached node from a previous navigation.
+     *
+     * This script is only emitted when minimal=false (i.e. nav exists in the DOM).
+     */
 
-  // Guard: the document keydown listener is installed exactly once per session.
-  let keydownInstalled = false;
+    // Guard: the document keydown listener is installed exactly once per session.
+    let keydownInstalled = false;
 
-  function handleEscape(e: KeyboardEvent) {
-    if (e.key !== 'Escape') return;
-    // Query live DOM at event time — never a stale/detached reference.
-    const liveToggle = document.getElementById('mobile-nav-toggle');
-    const liveNav = document.getElementById('mobile-nav');
-    if (!liveToggle || !liveNav) return;
-    if (liveToggle.getAttribute('aria-expanded') === 'true') {
-      liveToggle.setAttribute('aria-expanded', 'false');
-      liveToggle.setAttribute('aria-label', 'Open navigation menu');
-      liveNav.setAttribute('aria-hidden', 'true');
-      liveNav.style.display = 'none';
-      liveToggle.focus();
-    }
-  }
-
-  function initMobileNav() {
-    const toggle = document.getElementById('mobile-nav-toggle');
-    const nav = document.getElementById('mobile-nav');
-
-    if (!toggle || !nav) return;
-
-    function setOpen(open: boolean) {
-      toggle!.setAttribute('aria-expanded', String(open));
-      toggle!.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
-      nav!.setAttribute('aria-hidden', String(!open));
-      nav!.style.display = open ? 'block' : 'none';
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return;
+      // Query live DOM at event time — never a stale/detached reference.
+      const liveToggle = document.getElementById('mobile-nav-toggle');
+      const liveNav = document.getElementById('mobile-nav');
+      if (!liveToggle || !liveNav) return;
+      if (liveToggle.getAttribute('aria-expanded') === 'true') {
+        liveToggle.setAttribute('aria-expanded', 'false');
+        liveToggle.setAttribute('aria-label', 'Open navigation menu');
+        liveNav.setAttribute('aria-hidden', 'true');
+        liveNav.style.display = 'none';
+        liveToggle.focus();
+      }
     }
 
-    // Remove any stale listeners from a previous page load by cloning
-    const freshToggle = toggle.cloneNode(true) as HTMLElement;
-    toggle.parentNode?.replaceChild(freshToggle, toggle);
+    function initMobileNav() {
+      const toggle = document.getElementById('mobile-nav-toggle');
+      const nav = document.getElementById('mobile-nav');
 
-    freshToggle.addEventListener('click', () => {
-      const isOpen = freshToggle.getAttribute('aria-expanded') === 'true';
-      setOpen(!isOpen);
-    });
+      if (!toggle || !nav) return;
 
-    // Install the document keydown handler exactly once per session.
-    // handleEscape queries the live DOM, so it is safe across navigations.
-    if (!keydownInstalled) {
-      document.addEventListener('keydown', handleEscape);
-      keydownInstalled = true;
+      function setOpen(open: boolean) {
+        toggle!.setAttribute('aria-expanded', String(open));
+        toggle!.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+        nav!.setAttribute('aria-hidden', String(!open));
+        nav!.style.display = open ? 'block' : 'none';
+      }
+
+      // Remove any stale listeners from a previous page load by cloning
+      const freshToggle = toggle.cloneNode(true) as HTMLElement;
+      toggle.parentNode?.replaceChild(freshToggle, toggle);
+
+      freshToggle.addEventListener('click', () => {
+        const isOpen = freshToggle.getAttribute('aria-expanded') === 'true';
+        setOpen(!isOpen);
+      });
+
+      // Install the document keydown handler exactly once per session.
+      // handleEscape queries the live DOM, so it is safe across navigations.
+      if (!keydownInstalled) {
+        document.addEventListener('keydown', handleEscape);
+        keydownInstalled = true;
+      }
+
+      // Auto-close when a mobile nav link is tapped
+      nav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => setOpen(false));
+      });
     }
 
-    // Auto-close when a mobile nav link is tapped
-    nav.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => setOpen(false));
-    });
-  }
-
-  // astro:page-load fires on first render AND after every View Transitions navigation
-  document.addEventListener('astro:page-load', initMobileNav);
-</script>
+    // astro:page-load fires on first render AND after every View Transitions navigation
+    document.addEventListener('astro:page-load', initMobileNav);
+  </script>
+)}

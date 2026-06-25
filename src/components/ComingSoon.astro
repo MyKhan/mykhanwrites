@@ -1,0 +1,45 @@
+---
+/**
+ * ComingSoon.astro — Coming-soon capture page composition
+ *
+ * Renders:
+ *   1. <Hero /> — locked hero; primary CTA ("Read the first pages") scrolls to #letters
+ *   2. <Section><LettersForm variant="full" /></Section> — the full gift offer;
+ *      the wrapper div has id="letters" (confirmed in LettersForm.astro line 48),
+ *      which is the anchor target for the Hero CTA.
+ *   3. A quiet, centered note: site.comingSoon.note ("The full site is on its way.")
+ *
+ * Minimal chrome: this component is always rendered inside
+ * <BaseLayout minimal noindex={PRELAUNCH}> — no nav, identity-only footer.
+ *
+ * No other sections are built here — Phase 6b assembles the full homepage IA.
+ */
+
+import { site } from '../lib/data';
+import Hero from './Hero.astro';
+import LettersForm from './LettersForm.astro';
+import Section from './Section.astro';
+---
+
+<Hero />
+
+<!-- LettersForm: id="letters" lives on the inner wrapper (LettersForm.astro).
+     The Hero primary CTA href="#letters" anchor-jumps here. -->
+<Section>
+  <LettersForm variant="full" />
+</Section>
+
+<!-- Quiet "full site on its way" note — centered, muted, below the form -->
+<p class="coming-soon-note">{site.comingSoon.note}</p>
+
+<style>
+  .coming-soon-note {
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--color-muted);
+    letter-spacing: 0.04em;
+    padding-block: clamp(24px, 4vh, 40px);
+    margin: 0;
+  }
+</style>
