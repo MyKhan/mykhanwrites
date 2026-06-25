@@ -1,0 +1,245 @@
+---
+/**
+ * LettersForm.astro — Newsletter signup spine (Kit-wired, email-only)
+ *
+ * Variants:
+ *   'full'    (default) — heading + body copy + email field + submit + microcopy
+ *   'compact'           — one-line lead + email field + submit + microcopy (footer)
+ *
+ * Kit wiring — native hosted-form POST, CORS-safe, NO client fetch, NO KIT_API_KEY:
+ *   action: https://app.kit.com/forms/{KIT_FORM_ID}/subscriptions
+ *   field:  email_address  (Kit/ConvertKit hosted-form standard field name)
+ *   data-astro-reload: prevents <ClientRouter/> from intercepting the cross-origin POST;
+ *     the browser navigates to Kit's hosted double-opt-in confirmation page (CORS-safe).
+ *
+ * Degraded/pending state (T6):
+ *   When PUBLIC_KIT_FORM_ID is empty/unset at build time → submit is disabled +
+ *   site.pending.kitPending note rendered. No JS error, no silent dead button.
+ *
+ * Kit dashboard config (account-pending — NOT hardcoded here):
+ *   1. Double opt-in ON — the confirmation email delivers the Chapter-1 / first-pages gift.
+ *   2. Tags to apply on subscribe: source=mykhanwrites, interest=novel-launch
+ *      Configure in the Kit form's Incentive / automation settings in the dashboard.
+ *      (Hidden tag fields are included below as supplemental — Kit may or may not honour them
+ *      on hosted forms; dashboard config is authoritative.)
+ *   3. Success redirect: configure in Kit dashboard to /thanks/ once that page is built.
+ *      Post-account refinement — /thanks/ is NOT built in this phase.
+ *      The §7 success microcopy (site.states.newsletterSuccess) is reserved for that page.
+ *
+ * id="letters": on the wrapping div — hero CTA anchor-jumps here;
+ *   email input is the focus target for the hero CTA JS enhancement.
+ */
+
+import { site, novel } from '../lib/data';
+
+interface Props {
+  variant?: 'full' | 'compact';
+}
+
+const { variant = 'full' } = Astro.props;
+
+const KIT_FORM_ID = import.meta.env.PUBLIC_KIT_FORM_ID;
+const isPending = !KIT_FORM_ID || String(KIT_FORM_ID).trim() === '';
+const formAction = isPending
+  ? '#'
+  : `https://app.kit.com/forms/${KIT_FORM_ID}/subscriptions`;
+---
+
+<div id="letters" class:list={['letters-form', `letters-form--${variant}`]}>
+  {variant === 'full' ? (
+    <>
+      <h2 class="letters-heading">
+        Read the first pages of <em class="letters-novel-title">{novel.title}</em>
+      </h2>
+      <p class="letters-body">{site.letters.body}</p>
+    </>
+  ) : (
+    <p class="letters-lead">{site.footer.compactSignup.lead}</p>
+  )}
+
+  <form
+    class="letters-form-el"
+    method="POST"
+    action={formAction}
+    data-astro-reload
+    aria-label="Newsletter signup"
+  >
+    {/* Supplemental hidden tag fields — dashboard config is authoritative */}
+    {!isPending && (
+      <Fragment>
+        <input type="hidden" name="tags[]" value="source:mykhanwrites" />
+        <input type="hidden" name="tags[]" value="interest:novel-launch" />
+      </Fragment>
+    )}
+
+    <div class="letters-field-row">
+      <label for={`email-${variant}`} class="sr-only">Email address</label>
+      <input
+        id={`email-${variant}`}
+        type="email"
+        name="email_address"
+        class="letters-email"
+        placeholder="your@email.com"
+        required
+        autocomplete="email"
+        disabled={isPending || undefined}
+      />
+
+      <button
+        type="submit"
+        class="letters-submit"
+        disabled={isPending || undefined}
+        aria-disabled={isPending ? 'true' : undefined}
+      >
+        {variant === 'full' ? site.letters.button : site.footer.compactSignup.button}
+      </button>
+    </div>
+
+    {isPending && (
+      <p class="letters-pending" role="status">
+        {site.pending.kitPending}
+      </p>
+    )}
+
+    <p class="letters-microcopy">
+      {variant === 'full' ? site.letters.microcopy : site.footer.compactSignup.microcopy}
+    </p>
+  </form>
+</div>
+
+<style>
+  /* ── Full variant ── */
+  .letters-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 430;
+    line-height: 1.15;
+    letter-spacing: -0.018em;
+    color: var(--color-parchment);
+    max-width: var(--measure);
+    margin-block: 0 1rem;
+  }
+
+  .letters-novel-title {
+    font-style: italic;
+  }
+
+  .letters-body {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-parchment-dim);
+    max-width: var(--measure);
+    margin-block: 0 1.6rem;
+  }
+
+  /* ── Compact variant ── */
+  .letters-lead {
+    font-size: 0.92rem;
+    font-weight: 300;
+    color: var(--color-parchment-dim);
+    margin-block: 0 0.9rem;
+  }
+
+  /* ── Field row ── */
+  .letters-field-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: var(--measure);
+    margin-block-end: 0.6rem;
+  }
+
+  .letters-email {
+    flex: 1 1 220px;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.65em 1em;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(236,227,210,.22);
+    background: rgba(255,255,255,.04);
+    color: var(--color-parchment);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 300;
+    transition: border-color var(--t) var(--ease-out);
+    outline: none;
+  }
+
+  .letters-email::placeholder {
+    color: var(--color-muted);
+  }
+
+  /* Border warms to amber on focus */
+  .letters-email:focus {
+    border-color: var(--color-amber);
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+
+  .letters-email:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Submit — amber, ≥44px tap target */
+  .letters-submit {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0.65em 1.5em;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-amber);
+    background: var(--color-amber);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background var(--t),
+      border-color var(--t),
+      transform var(--t) var(--ease-out);
+  }
+
+  .letters-submit:hover:not(:disabled) {
+    background: var(--color-amber-bright);
+    border-color: var(--color-amber-bright);
+    transform: translateY(-1px);
+  }
+
+  .letters-submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Pending note */
+  .letters-pending {
+    font-size: 0.84rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin-block: 0 0.5rem;
+  }
+
+  /* Microcopy */
+  .letters-microcopy {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+    margin-block: 0;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>

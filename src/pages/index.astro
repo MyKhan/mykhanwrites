@@ -1,47 +1,25 @@
 ---
 /**
- * index.astro — Placeholder homepage
+ * index.astro — Homepage (Phase 6a: Hero + LettersForm)
  *
- * Pulls title/description from the `pages` collection `home.md` frontmatter
- * to keep the Phase 3 build-time Zod validation gate active.
- *
- * Wired to BaseLayout so the full site chrome (Header/Footer/Grain) is
- * verifiable from Phase 4 onwards.
- *
- * Phase 6 replaces the body content with the real homepage hero + sections.
- * The BaseLayout wiring stays — this is not throwaway.
- *
- * Note: the bare `import '../lib/data'` from the previous placeholder is now
- * redundant — BaseLayout → Header/Footer both consume data.ts directly,
- * keeping the build-time validation gate active. It is intentionally removed here.
+ * Renders the locked Hero and Kit-wired LettersForm for M1 verification.
+ * Full homepage IA (NovelBridge, AboutPreview, WritingRange) comes in Phase 6b.
+ * BaseLayout wiring (Header/Footer/Grain/ClientRouter) stays intact.
  */
 
 import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import LettersForm from '../components/LettersForm.astro';
+import Section from '../components/Section.astro';
 
 const homePage = await getEntry('pages', 'home');
 const { title, description } = homePage.data;
 ---
 
 <BaseLayout title={title} description={description}>
-  <!-- Phase 6 will replace this body with the real homepage hero + sections -->
-  <div
-    style="min-height:60vh;display:flex;align-items:center;justify-content:center;padding-block:clamp(72px,10vh,132px)"
-  >
-    <div style="text-align:center;max-width:var(--measure);padding-inline:clamp(20px,5vw,40px)">
-      <p
-        style="font-size:.74rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--color-amber);margin-bottom:16px"
-      >
-        Coming August 2026
-      </p>
-      <h1
-        style="font-family:var(--font-serif);font-size:clamp(2.4rem,5vw,3.8rem);font-weight:430;letter-spacing:-.02em;line-height:1.05;margin-bottom:20px"
-      >
-        Meher Yar Khan
-      </h1>
-      <p style="color:var(--color-parchment-dim);font-size:1.08rem;line-height:1.6">
-        Warm stories with cold corners.
-      </p>
-    </div>
-  </div>
+  <Hero />
+  <Section>
+    <LettersForm variant="full" />
+  </Section>
 </BaseLayout>

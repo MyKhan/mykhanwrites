@@ -1,0 +1,241 @@
+---
+/**
+ * Hero.astro — Locked hero signature (STATIC, full-bleed, no parallax, no book cover)
+ *
+ * Gradient stack (exact lock — phase-6a-brief.md + styleguide §00 "HERO (locked)"):
+ *   Layer 1: cold shadow from right — linear-gradient(270deg, rgba(2,4,6,.97) 0%, rgba(4,6,9,.7) 11.2%, rgba(8,11,15,.26) 24.5%, transparent 34%)
+ *   Layer 2: cold corner top-right  — radial-gradient(46% 60% at 100% 3%, rgba(11,16,22,.55), transparent 62%)
+ *   Layer 3: warm light x16%/y23%  — radial-gradient(93% 99% at 16% 23%, rgba(224,177,94,.21) 0%, rgba(224,177,94,.085) 34%, transparent 70%)
+ *   Layer 4: base warm near-black  — linear-gradient(180deg, #15100C 0%, #0C0806 100%)
+ *
+ * Overlay layers (pointer-events:none, absolutely positioned):
+ *   .glow    — warm glow node: left:16%;top:23%;230×230px;translate(-50%,-50%);
+ *              radial-gradient(closest-side,rgba(232,193,110,.36),transparent 70%);blur(26px)
+ *   .vignette — T22 full-bleed: box-shadow:inset 0 0 240px 72px rgba(4,3,2,.6)
+ *
+ * Slogan "Warm stories with cold corners." appears EXACTLY ONCE — in the H1.
+ * Phase 9 adds intro stagger; render final state here.
+ */
+
+import { site, novel } from '../lib/data';
+import Eyebrow from './Eyebrow.astro';
+import PrimaryButton from './primitives/PrimaryButton.astro';
+import ArrowLink from './primitives/ArrowLink.astro';
+import QuietLink from './primitives/QuietLink.astro';
+---
+
+<section class="hero" aria-label="Site hero">
+  <!-- Warm glow node — decorative atmosphere, pointer-events:none -->
+  <div class="glow" aria-hidden="true"></div>
+  <!-- Vignette — T22 full-bleed inset shadow, pointer-events:none -->
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- Content column, capped at --frame -->
+  <div class="hero-inner">
+    <Eyebrow tone="eyebrow">Meher Yar Khan · Writer</Eyebrow>
+
+    <h1 class="hero-h1">
+      Warm stories with<br />cold corners.
+    </h1>
+
+    <p class="hero-lede">
+      Lonely people, hidden selves, and the places they go to feel less alone.
+    </p>
+
+    <p class="hero-novel-cue">
+      A first novel — <span class="novel-title">{novel.title}</span> — {novel.launch}.
+    </p>
+
+    <p class="hero-range">Across fiction, screen, and other worlds.</p>
+
+    <div class="hero-cta-row">
+      <PrimaryButton
+        href="#letters"
+        data-hero-cta=""
+        data-umami-event="hero-read-first-pages"
+      >{site.cta.heroPrimary}</PrimaryButton>
+
+      <ArrowLink href={site.cta.novelWorldUrl}>
+        {site.cta.novelWorld}
+      </ArrowLink>
+
+      <QuietLink href="/about/">
+        {site.cta.meetAuthor}
+      </QuietLink>
+    </div>
+  </div>
+</section>
+
+<!--
+  Hero primary-CTA enhancement.
+  Bound on astro:page-load — fires on first load AND after each View Transitions navigation,
+  so the listener survives <ClientRouter /> SPA navigation.
+  No-JS fallback: the <a href="#letters"> anchor jump works without any JS.
+  Reduced-motion: jumps + focuses instead of smooth-scroll.
+-->
+<script>
+  function bindHeroCta() {
+    const cta = document.querySelector<HTMLAnchorElement>('[data-hero-cta]');
+    if (!cta) return;
+
+    // Clone to remove any stale listener from a previous page-load cycle
+    const fresh = cta.cloneNode(true) as HTMLAnchorElement;
+    cta.replaceWith(fresh);
+
+    fresh.addEventListener('click', (e) => {
+      const target = document.getElementById('letters');
+      if (!target) return;
+
+      e.preventDefault();
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const emailInput = target.querySelector<HTMLInputElement>('input[type="email"]');
+
+      if (reducedMotion) {
+        target.scrollIntoView();
+        emailInput?.focus();
+      } else {
+        target.scrollIntoView({ behavior: 'smooth' });
+        if (emailInput) {
+          const doFocus = () => emailInput.focus();
+          if ('onscrollend' in window) {
+            window.addEventListener('scrollend', doFocus, { once: true });
+          } else {
+            setTimeout(doFocus, 600);
+          }
+        }
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', bindHeroCta);
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    min-height: clamp(520px, 88vh, 920px);
+    display: flex;
+    align-items: center;
+
+    /* 4-layer gradient stack — LOCKED */
+    background:
+      /* Layer 1: cold shadow pressing from the right, occupying the right ~34% */
+      linear-gradient(270deg, rgba(2,4,6,.97) 0%, rgba(4,6,9,.7) 11.2%, rgba(8,11,15,.26) 24.5%, transparent 34%),
+      /* Layer 2: cold corner, top-right */
+      radial-gradient(46% 60% at 100% 3%, rgba(11,16,22,.55), transparent 62%),
+      /* Layer 3: warm light source at x16% / y23%, warmth reach 93% */
+      radial-gradient(93% 99% at 16% 23%, rgba(224,177,94,.21) 0%, rgba(224,177,94,.085) 34%, transparent 70%),
+      /* Layer 4: base warm near-black */
+      linear-gradient(180deg, #15100C 0%, #0C0806 100%);
+  }
+
+  /* Warm glow node — absolutely-positioned, pointer-events:none */
+  .glow {
+    position: absolute;
+    left: 16%;
+    top: 23%;
+    width: 230px;
+    height: 230px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(closest-side, rgba(232,193,110,.36), transparent 70%);
+    filter: blur(26px);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Vignette — T22 full-bleed inset shadow */
+  .vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    user-select: none;
+    box-shadow: inset 0 0 240px 72px rgba(4,3,2,.6);
+  }
+
+  /* Content column */
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--frame);
+    margin-inline: auto;
+    padding-inline: clamp(20px, 5vw, 40px);
+    padding-block: clamp(56px, 8vh, 100px);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* H1 — display type */
+  .hero-h1 {
+    font-family: var(--font-serif);
+    font-size: var(--text-display);
+    font-weight: 430;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--color-parchment);
+    margin-block: 0.55rem 1.1rem;
+    max-width: 16ch;
+  }
+
+  /* Lede — parchment-dim, capped at ~28em */
+  .hero-lede {
+    font-size: var(--text-lede);
+    font-weight: 300;
+    line-height: 1.55;
+    color: var(--color-parchment-dim);
+    max-width: 28em;
+    margin-block: 0 1.1rem;
+  }
+
+  /* Novel cue — Fraunces italic */
+  .hero-novel-cue {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1rem, 1.2vw, 1.12rem);
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--color-parchment);
+    max-width: 32em;
+    margin-block: 0 0.7rem;
+  }
+
+  /* Novel title within cue — amber-bright, weight 500, inherits italic from .hero-novel-cue */
+  .novel-title {
+    color: var(--color-amber-bright);
+    font-weight: 500;
+  }
+
+  /* Range line — small, muted */
+  .hero-range {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--color-muted);
+    letter-spacing: 0.04em;
+    margin-block: 0 2rem;
+  }
+
+  /* CTA row — wraps on narrow viewports */
+  .hero-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(12px, 2vw, 20px);
+  }
+
+  /* Mobile: text-first at ~380px */
+  @media (max-width: 480px) {
+    .hero-h1,
+    .hero-lede,
+    .hero-novel-cue {
+      max-width: none;
+    }
+
+    .hero-cta-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
