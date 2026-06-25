@@ -198,6 +198,34 @@ body {
 }
 
 /* ==========================================================================
+   VIEW TRANSITIONS — Crossfade tuning (Phase 9)
+   Astro's <ClientRouter /> (View Transitions API) defaults vary by browser.
+   Override to a calm ~320ms crossfade. No slide, zoom, or directional motion.
+   The old page fades out while the new page fades in simultaneously.
+   ========================================================================== */
+::view-transition-old(root) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-soft);
+  animation-name: view-transition-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-soft);
+  animation-name: view-transition-fade-in;
+}
+
+@keyframes view-transition-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes view-transition-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ==========================================================================
    REDUCED MOTION
    Disable smooth scroll; collapse animations/transitions to final states.
    Phase-specific Reveal / motion components also honor this at their level.
@@ -214,5 +242,11 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Disable View Transitions crossfade — instant swap under reduced-motion. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
   }
 }

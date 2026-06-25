@@ -32,7 +32,7 @@ import QuietLink from './primitives/QuietLink.astro';
 
   <!-- Content column, capped at --frame -->
   <div class="hero-inner">
-    <Eyebrow tone="eyebrow">Meher Yar Khan · Writer</Eyebrow>
+    <Eyebrow tone="eyebrow" class="hero-eyebrow">Meher Yar Khan · Writer</Eyebrow>
 
     <h1 class="hero-h1">
       Warm stories with<br />cold corners.
@@ -112,6 +112,67 @@ import QuietLink from './primitives/QuietLink.astro';
 </script>
 
 <style>
+  /* ==========================================================================
+     HERO INTRO STAGGER — Phase 9
+     Beats: eyebrow → H1 → lede → novel-cue → range → CTA row (~80ms apart)
+     CSS-first: @keyframes + animation-delay per beat.
+     Only text beats animate; gradient/glow are NOT animated.
+     Re-runs naturally on View Transitions navigation (elements are re-inserted).
+     ========================================================================== */
+
+  @keyframes hero-beat-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /*
+     Base animation — applied via :global() so it reaches the Eyebrow <p>
+     (child component root element, outside Hero.astro's scoped attribute scope).
+     All other beat elements (.hero-h1, .hero-lede, etc.) are rendered directly
+     in this component and could use scoped selectors, but :global() is used
+     throughout for consistency and to avoid selector specificity confusion.
+  */
+  :global(.hero-inner .hero-eyebrow),
+  .hero-h1,
+  .hero-lede,
+  .hero-novel-cue,
+  .hero-range,
+  .hero-cta-row {
+    opacity: 0;
+    animation: hero-beat-in 480ms var(--ease-out) both;
+  }
+
+  /* Stagger: eyebrow=0ms, H1=80ms, lede=160ms, novel-cue=240ms, range=320ms, CTAs=400ms */
+  :global(.hero-inner .hero-eyebrow) { animation-delay: 0ms;   }
+  .hero-h1                           { animation-delay: 80ms;  }
+  .hero-lede                         { animation-delay: 160ms; }
+  .hero-novel-cue                    { animation-delay: 240ms; }
+  .hero-range                        { animation-delay: 320ms; }
+  .hero-cta-row                      { animation-delay: 400ms; }
+
+  /* Reduced-motion: disable hero-intro animation; beats show at final state immediately.
+     The global reduced-motion block in global.css also collapses animation-duration
+     to 0.01ms, but explicit animation:none here is belt-and-suspenders for
+     keyframe-specific safety (keyframes aren't caught by transition-only resets). */
+  @media (prefers-reduced-motion: reduce) {
+    :global(.hero-inner .hero-eyebrow),
+    .hero-h1,
+    .hero-lede,
+    .hero-novel-cue,
+    .hero-range,
+    .hero-cta-row {
+      animation: none !important;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   .hero {
     position: relative;
     overflow: hidden;
