@@ -3,11 +3,13 @@
 **Companion to:** `MyKhanWrites_Developer_Prompt.md` (fold this into §4 Design system).
 **Preview:** `mockups/styleguide.html` (living visual), `mockups/homepage.html` (applied).
 **Status:** locked design direction (2026-06-25).
+**Canonical source of truth:** root [`DESIGN.md`](../DESIGN.md) (visual system) + [`PRODUCT.md`](../PRODUCT.md) (strategy).
+This kit is the detailed token companion; where they differ, DESIGN.md wins. See §9 for this session's locked decisions.
 
 ## Direction (locked)
 Dusk / dark · single **amber** accent · **sharp editorial** edges · subtle **film grain** ·
-**Fraunces** headings + **Inter** body · **refined & subtle** motion + **page crossfades** + **gentle
-hero parallax** (no custom cursor, no image clip-reveals) · **warm-duotone** imagery.
+**Fraunces** headings + **Inter** body · **refined & subtle** motion + **page crossfades**
+(**no parallax**, no custom cursor, no image clip-reveals) · **warm-duotone** imagery.
 
 ---
 
@@ -66,8 +68,8 @@ Amber is used **sparingly** — accent only, never large fills beyond the one pr
 - **Link underline:** `::after` scaleX 0→1 from left, 280ms.
 - **Button hover:** translateY −2px + background → amber-bright, 280ms.
 - **Page transitions:** **Astro View Transitions**, ~320ms crossfade between pages.
-- **Hero parallax:** hero image/texture drifts ~12% slower than scroll (transform translateY).
-  **Disabled** on mobile and under reduced-motion.
+- **No hero parallax** (resolved 2026-06-25): the hero is a static light/gradient composition, so
+  parallax is omitted — honoring the calm brand and the Developer Prompt's explicit motion ceiling.
 - **`prefers-reduced-motion`:** disable reveals, parallax, transitions; show final states.
 
 ## 5. Imagery — warm duotone + grain
@@ -105,3 +107,18 @@ alt text on all imagery; ≥44px tap targets; legible text-over-image (scrim whe
 - Motion: CSS-first; one tiny IntersectionObserver for reveals; small parallax script (guard
   mobile + reduced-motion); Astro `<ViewTransitions />` in the layout head.
 - Grain + duotone are CSS/SVG — no images required for the effects themselves.
+
+## 9. Locked session decisions (2026-06-25, with Meher)
+
+Decisions made live with the author, validated by research where noted. These refine — not replace — the tokens above.
+
+- **Hero lighting (locked, exact):** one warm light source at **x 16% / y 23%**, warmth reach **93%**, cold shadow occupying the right **~34%**. Warm light falls from the upper-left so text never sits on the hotspot (protects contrast); the cold presses in from the right as a true *dark* shadow (it eats light, it does not glow); low vignette + full-screen grain. Implemented via layered CSS gradients (see `mockups/homepage-full` preview).
+- **Hero CTAs (research-backed):** **one** primary button only — *"Read the first pages"* (option B: it glides to the Letters signup and focuses the field). *"Enter the novel world →"* and *"Meet the author"* are quiet links, **not** competing buttons. Rationale: single-CTA principle (Hick's Law / choice paralysis).
+- **Homepage section order (research-backed):** Header → Hero → **Novel bridge** → **Letters/signup (moved up, caught at peak interest)** → About preview → **Writing (moved lower, weighted, CTA-free)** → Footer. The newsletter is the page's spine, repeated hero + mid-page + footer as the *same* offer.
+- **Newsletter:** email-only field; reassurance microcopy *"A few letters a year. No spam. Unsubscribe anytime."* Mitigate Kit double-opt-in friction by making the confirmation email's button itself the gift ("Get my first pages").
+- **No book cover in the hero** (it's `[PENDING]` and open-ended). A reserved "cover slot" lives in the novel bridge / novel page for later; the unrevealed cover is a *subscriber incentive*, not free homepage decoration.
+- **Layout — "calm margins done well":** capped reading column (~1280 frame, text measure ~34em / 65–75ch) **plus** full-bleed atmosphere edge-to-edge **plus** type/spacing scale-up on large screens, so wide displays read as deliberate, never empty.
+- **Crane:** keep the symbol, **redesign it** into a recognizable origami crane for favicon/footer only (current SVG is unclear). Not in the hero.
+- **Stack confirmed:** Astro + Tailwind, static, CMS-ready — chosen specifically for bespoke (non-templated) design, speed (Lighthouse ≥90), privacy (no cookie banner), and native SEO/structured-data control over WordPress.
+- **Removed anti-pattern:** the diagonal repeating-linear-gradient "rain" is banned — it reads as cheap stripes, not weather.
+- **Parallax:** resolved to **none** — the hero is a static light/gradient composition; omitting parallax honors the calm brand and the Developer Prompt's motion ceiling (reconciles the earlier conflicting UI-Kit note).

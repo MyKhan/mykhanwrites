@@ -69,7 +69,7 @@
 
   /* buttons + links */
   .row{display:flex; gap:22px; align-items:center; flex-wrap:wrap; margin-bottom:24px}
-  .btn{display:inline-block; padding:.92em 1.7em; border-radius:var(--radius); font-size:.82rem; letter-spacing:.13em; text-transform:uppercase; font-weight:500; border:1px solid var(--amber); color:var(--ink); background:var(--amber); transition:transform var(--t) var(--ease-out), background var(--t)}
+  .btn{display:inline-block; padding:.95em 1.8em; border-radius:var(--radius); font-size:.82rem; letter-spacing:.13em; text-transform:uppercase; font-weight:500; border:1px solid var(--amber); color:var(--ink); background:var(--amber); transition:transform var(--t) var(--ease-out), background var(--t)}
   .btn:hover{background:var(--amber-bright); border-color:var(--amber-bright); transform:translateY(-2px)}
   .btn-ghost{background:transparent; color:var(--amber)}
   .btn-ghost:hover{background:rgba(201,162,75,.1); color:var(--amber-bright); transform:translateY(-2px)}
@@ -141,7 +141,34 @@
   <section class="intro">
     <svg class="crane" style="margin-bottom:14px"><use href="#crane"/></svg>
     <h1>The design system</h1>
-    <p>A living styleguide for MyKhanWrites.com — dusk palette, sharp editorial structure, Fraunces &amp; Inter, a single amber accent, film grain, and refined micro-motion. Scroll: the sections themselves fade up the way the real site will.</p>
+    <p>A living styleguide for MyKhanWrites.com — dusk palette, sharp editorial structure, Fraunces &amp; Inter, a single amber accent, film grain, and refined micro-motion. Scroll: the sections themselves fade up the way the real site will. Canonical source of truth: root <code>DESIGN.md</code> + <code>PRODUCT.md</code>. <em>(The crane mark above is a placeholder — pending a cleaner origami redesign for favicon/footer.)</em></p>
+  </section>
+
+  <!-- HERO (locked) -->
+  <section class="sec reveal">
+    <p class="kicker">00 — The hero</p>
+    <h2>The signature, locked</h2>
+    <p class="note">The homepage hero — warm light from the upper-left (x&nbsp;16% / y&nbsp;23%), warmth reach 93%, the cold shadow on the right ~34%. One primary CTA; the rest are quiet links. Shown framed here; on the real site the atmosphere runs full-bleed.</p>
+    <div style="position:relative; overflow:hidden; border:1px solid var(--line); border-radius:var(--radius); min-height:400px; display:flex; align-items:center; padding:0 40px;
+      background:
+        linear-gradient(270deg, rgba(2,4,6,.97) 0%, rgba(4,6,9,.7) 11.2%, rgba(8,11,15,.26) 24.5%, transparent 34%),
+        radial-gradient(46% 60% at 100% 3%, rgba(11,16,22,.55), transparent 62%),
+        radial-gradient(93% 99% at 16% 23%, rgba(224,177,94,.21) 0%, rgba(224,177,94,.085) 34%, transparent 70%),
+        linear-gradient(180deg,#15100C 0%,#0C0806 100%);">
+      <div style="position:absolute; left:16%; top:23%; width:230px; height:230px; transform:translate(-50%,-50%); background:radial-gradient(closest-side, rgba(232,193,110,.36), transparent 70%); filter:blur(26px); pointer-events:none"></div>
+      <div style="position:absolute; inset:0; box-shadow:inset 0 0 200px 56px rgba(4,3,2,.5); pointer-events:none"></div>
+      <div style="position:relative; z-index:2; max-width:620px">
+        <p class="eyb" style="color:var(--brown)">Meher Yar Khan · Writer</p>
+        <div class="d1" style="margin:.4rem 0 0">Warm stories with<br>cold corners.</div>
+        <p class="lede" style="margin-top:1.1rem; max-width:28em">Lonely people, hidden selves, and the places they go to feel less alone.</p>
+        <p style="margin-top:1.1rem; font-family:var(--serif); font-style:italic; color:var(--parchment)">A first novel — <span style="color:var(--amber-bright); font-weight:500">They Only Came When It Rained</span> — coming August 2026.</p>
+        <div class="row" style="margin-top:1.7rem; margin-bottom:0">
+          <a class="btn" href="#">Read the first pages</a>
+          <a class="arrow" href="#">Enter the novel world →</a>
+          <a class="quiet" href="#">Meet the author</a>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- COLOR -->
@@ -271,7 +298,8 @@
     </div>
     <div class="token-grid">
       <div class="tok"><div class="k">Radius</div><div class="v">2px</div><div class="d">buttons, cards, inputs (3px images)</div></div>
-      <div class="tok"><div class="k">Container</div><div class="v">1080px / 28–32px gutter</div><div class="d">section padding 96px (64 mobile)</div></div>
+      <div class="tok"><div class="k">Container</div><div class="v">~1280px frame · fluid gutter</div><div class="d">text measure capped ~34em (65–75ch)</div></div>
+      <div class="tok"><div class="k">Calm-margins rule</div><div class="v">cap the reading column</div><div class="d">full-bleed atmosphere + scale up on large screens — never empty</div></div>
       <div class="tok"><div class="k">Ease — out</div><div class="v">cubic-bezier(.22,.61,.36,1)</div><div class="d">reveals, hovers</div></div>
       <div class="tok"><div class="k">Hairline</div><div class="v">1px rgba(236,227,210,.12)</div><div class="d">dividers, borders</div></div>
     </div>

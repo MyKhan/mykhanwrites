@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-25T12:00:00Z",
+  "title": "Design System: MyKhanWrites",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "neutral", "displayName": "Ink (Warm Near-Black)", "canonical": "#14110F", "tonalRamp": ["#0C0907", "#100D0B", "#14110F", "#1B1714", "#221D18", "#2A241E", "#3A332B", "#4A4137"] },
+      "parchment": { "role": "neutral", "displayName": "Parchment", "canonical": "#ECE3D2", "tonalRamp": ["#3A352C", "#5A5345", "#7A6F5C", "#9A8E78", "#A49A88", "#C7BCA8", "#ECE3D2", "#F6F0E4"] },
+      "amber": { "role": "primary", "displayName": "Lamplight Amber", "canonical": "#C9A24B", "tonalRamp": ["#2A2110", "#473714", "#6B5320", "#8E6F2B", "#A8812F", "#C9A24B", "#E0B15E", "#F0D49A"] },
+      "cold-shadow": { "role": "secondary", "displayName": "Cold-Shadow Blue-Grey", "canonical": "#5B6B78", "tonalRamp": ["#11161B", "#1B232B", "#2C3A45", "#3D4F5C", "#4E6171", "#5B6B78", "#7C8C98", "#A6B4BE"] },
+      "raincoat": { "role": "secondary", "displayName": "Raincoat Yellow (Novel Only)", "canonical": "#E8C547", "tonalRamp": ["#3A2F0E", "#5C4B14", "#7E681C", "#A88E26", "#CBAB33", "#E8C547", "#EFD46E", "#F6E4A2"] },
+      "success": { "role": "neutral", "displayName": "Sage Success", "canonical": "#8FB08A", "tonalRamp": ["#1C2A1B", "#2E4029", "#42583B", "#5A744F", "#739066", "#8FB08A", "#AFC8AA", "#CFE0CB"] },
+      "error": { "role": "neutral", "displayName": "Clay Error", "canonical": "#C97A6A", "tonalRamp": ["#2E1611", "#48241B", "#693A2D", "#8C5040", "#AE6354", "#C97A6A", "#DC9C8F", "#ECC2B8"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headline only. Fraunces 430, clamp(2.7rem,6vw,5rem)." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles, often italic Fraunces." },
+      "title": { "displayName": "Title", "purpose": "Card and sub-section headings." },
+      "body": { "displayName": "Body", "purpose": "Running text, Inter 300, capped 65-75ch (~34em)." },
+      "label": { "displayName": "Eyebrow / Label", "purpose": "Section kickers, uppercase tracked Inter 500." },
+      "epigraph": { "displayName": "Epigraph", "purpose": "The novel's pull-quotes, italic Fraunces." }
+    },
+    "shadows": [
+      { "name": "hero-vignette", "value": "inset 0 0 240px 72px rgba(4,3,2,0.6)", "purpose": "The only structural 'shadow' — a low vignette that deepens the hero's edges. The system is otherwise flat." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.22,0.61,0.36,1)", "purpose": "Reveals and hovers — exponential ease-out, no bounce." },
+      { "name": "ease-soft", "value": "cubic-bezier(0.4,0,0.2,1)", "purpose": "Soft state transitions." },
+      { "name": "t", "value": "280ms", "purpose": "Default transition duration (hover, underline-draw)." },
+      { "name": "t-reveal", "value": "900ms", "purpose": "Scroll-reveal fade-up." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "820px" },
+      { "name": "lg", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single primary CTA per view — carries the page's one goal.",
+      "html": "<button class='ds-btn-primary'>Read the first pages</button>",
+      "css": ".ds-btn-primary{background:#C9A24B;color:#14110F;border:1px solid #C9A24B;border-radius:2px;padding:0.95em 1.8em;font-family:Inter,system-ui,sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.13em;text-transform:uppercase;cursor:pointer;transition:background .28s,transform .28s cubic-bezier(.22,.61,.36,1)}.ds-btn-primary:hover{background:#E0B15E;border-color:#E0B15E;transform:translateY(-2px)}.ds-btn-primary:focus-visible{outline:2px solid #C9A24B;outline-offset:3px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action — transparent with amber text and border.",
+      "html": "<button class='ds-btn-ghost'>Enter the novel world &#8594;</button>",
+      "css": ".ds-btn-ghost{background:transparent;color:#C9A24B;border:1px solid #C9A24B;border-radius:2px;padding:0.95em 1.8em;font-family:Inter,system-ui,sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.13em;text-transform:uppercase;cursor:pointer;transition:background .28s,color .28s,transform .28s}.ds-btn-ghost:hover{background:rgba(201,162,75,0.1);color:#E0B15E;transform:translateY(-2px)}.ds-btn-ghost:focus-visible{outline:2px solid #C9A24B;outline-offset:3px}"
+    },
+    {
+      "name": "Underline-Draw Link",
+      "kind": "custom",
+      "refersTo": "link-underline",
+      "description": "Default feature/nav link — an amber underline scales in from the left on hover.",
+      "html": "<a class='ds-link-underline' href='#'>Read about the novel &#8594;</a>",
+      "css": ".ds-link-underline{position:relative;color:#ECE3D2;font-family:Inter,system-ui,sans-serif;font-size:0.9rem;text-decoration:none;padding-bottom:3px}.ds-link-underline::after{content:'';position:absolute;left:0;bottom:0;width:100%;height:1px;background:#C9A24B;transform:scaleX(0);transform-origin:left;transition:transform .28s cubic-bezier(.22,.61,.36,1)}.ds-link-underline:hover{color:#E0B15E}.ds-link-underline:hover::after{transform:scaleX(1)}"
+    },
+    {
+      "name": "Email Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The email-only newsletter field; border warms to amber on focus.",
+      "html": "<input class='ds-input' type='email' placeholder='your@email.com' aria-label='Email address' />",
+      "css": ".ds-input{background:#221D18;color:#ECE3D2;border:1px solid rgba(236,227,210,0.22);border-radius:2px;padding:0.95em 1.2em;font-family:Inter,system-ui,sans-serif;font-size:0.96rem;min-width:240px}.ds-input::placeholder{color:#A49A88}.ds-input:focus{outline:2px solid #C9A24B;outline-offset:2px;border-color:#C9A24B}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Flat dark card defined by a hairline; warms its border and lifts 2px on hover.",
+      "html": "<div class='ds-card'><h3>Fiction</h3><p>Novels and stories, warm at the center and darker at the edges.</p></div>",
+      "css": ".ds-card{background:#221D18;border:1px solid rgba(236,227,210,0.12);border-radius:2px;padding:34px;transition:border-color .28s,transform .28s cubic-bezier(.22,.61,.36,1)}.ds-card:hover{border-color:rgba(201,162,75,0.38);transform:translateY(-2px)}.ds-card h3{font-family:Fraunces,Georgia,serif;font-weight:430;font-size:1.6rem;color:#ECE3D2;margin:0 0 .6rem;letter-spacing:-0.02em}.ds-card p{font-family:Inter,system-ui,sans-serif;font-weight:300;color:#C7BCA8;font-size:1rem;line-height:1.65;margin:0}"
+    },
+    {
+      "name": "Eyebrow Label",
+      "kind": "custom",
+      "refersTo": "label",
+      "description": "Section kicker — uppercase, tracked, quiet.",
+      "html": "<p class='ds-eyebrow'>The author</p>",
+      "css": ".ds-eyebrow{font-family:Inter,system-ui,sans-serif;font-weight:500;font-size:0.74rem;letter-spacing:0.22em;text-transform:uppercase;color:#8A7358;margin:0}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lit Window at Dusk",
+    "overview": "A warm-near-black world, lit by one amber light, with the cold pressing at the edges. Cinematic without being loud, literary without being a magazine pastiche, intimate without being precious. Restrained on purpose but never timid — it earns its negative space the way a fine hardback earns wide margins, as confidence, not emptiness. Surfaces are flat and dark, defined by hairlines rather than shadows; a single amber accent does all the emotional work and is rationed so its rarity stays meaningful. Atmosphere (faint grain, warm-to-cold gradient, low vignette) runs full-bleed across the whole device, while the text stays in a calm, readable column.",
+    "keyCharacteristics": [
+      "Warm near-black surfaces; one rationed amber accent; the cold kept to the corners.",
+      "One characterful serif (Fraunces) + one clean sans (Inter); slogan stated once.",
+      "Flat by default — depth from hairlines, tonal layering, grain, and one warm light source.",
+      "Full-bleed atmosphere, calm capped text column; restraint that reads as confidence.",
+      "Refined, barely-there motion; reduced-motion fully honored."
+    ],
+    "rules": [
+      { "name": "The One Amber Rule", "body": "Amber is an accent, never a surface. Single primary button, links, marks, focus rings — never a large fill. Its rarity is the point.", "section": "colors" },
+      { "name": "The Cold-Corner Rule", "body": "The cold blue-grey is darker than the room it sits in — a shadow that eats light, confined to a corner or edge. Never a glowing wash, never a stripe, never the whole field.", "section": "colors" },
+      { "name": "The Raincoat Rule", "body": "#E8C547 is forbidden anywhere except the novel's own contexts.", "section": "colors" },
+      { "name": "The Slogan-Once Rule", "body": "'Warm stories with cold corners.' is the hero H1 and appears nowhere else on the site.", "section": "typography" },
+      { "name": "The Readable-Measure Rule", "body": "The frame may breathe wide on large screens, but a text column never exceeds ~75 characters. The frame scales; the measure does not.", "section": "typography" },
+      { "name": "The Flat-by-Default / Hairline Rule", "body": "Surfaces are flat at rest, separated by hairlines and tonal steps. Never pair a 1px border with a soft wide drop shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do light every key surface with one warm source and one cold corner — warmth for trust, shadow for intrigue.",
+      "Do keep one primary CTA ('Read the first pages') threaded through hero, mid-page, and footer; demote everything else to quiet links.",
+      "Do ration amber to accent only (#C9A24B); carry warmth with type, light, and imagery instead.",
+      "Do cap body text at 65-75 characters even as the frame widens; run atmosphere full-bleed and scale up type/spacing on large screens.",
+      "Do keep elevation flat — hairlines, tonal layering, grain; lift 2-3px and warm the border on hover.",
+      "Do describe, never label; keep everything spoiler-safe; state the slogan exactly once.",
+      "Do honor prefers-reduced-motion for every animation, and verify WCAG AA contrast on every new text/background pair."
+    ],
+    "donts": [
+      "Don't ship anything that could read as AI-generated or templated — the cardinal sin.",
+      "Don't use generic cafe-brown/coffee-shop browns, neon, corporate blue, or sweet pastels.",
+      "Don't add a cookie banner, exit-intent popup, or any pushy interrupt — the calm is the trust signal.",
+      "Don't default to editorial-magazine costume (drop-caps + broadsheet grid) on a brief that isn't a magazine.",
+      "Don't fake rain or texture with diagonal repeating-linear-gradient stripes — they read as cheap lines, not weather.",
+      "Don't pair a 1px border with a soft wide drop shadow; don't over-round (cards stay 2-3px); don't use border-left/right >1px as a colored stripe.",
+      "Don't let raincoat yellow (#E8C547) appear outside novel contexts; don't let amber become a large fill.",
+      "Don't put the unrevealed book cover on the homepage — it's a subscriber reward, not free decoration."
+    ]
+  }
+}

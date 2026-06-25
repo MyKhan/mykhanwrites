@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>After the Script — Path to Screen Representation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14110F; --ink-2:#1B1714; --ink-3:#221D18; --ink-deep:#100D0B;
+    --parchment:#ECE3D2; --parchment-dim:#C7BCA8; --muted:#A49A88; --brown:#8A7358;
+    --amber:#C9A24B; --amber-bright:#E0B15E; --cold:#5B6B78;
+    --line:rgba(236,227,210,.12); --line-strong:rgba(236,227,210,.22);
+    --success:#8FB08A; --error:#C97A6A;
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ink); color:var(--parchment); font-family:var(--sans); font-weight:300; line-height:1.65; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px; margin:0 auto; padding:0 clamp(24px,5vw,48px)}
+  h1,h2,h3{font-family:var(--serif); font-weight:430; line-height:1.1; letter-spacing:-.02em}
+  a{color:var(--amber); text-decoration:none; border-bottom:1px solid rgba(201,162,75,.35)} a:hover{color:var(--amber-bright)}
+
+  header{position:relative; overflow:hidden; padding:72px 0 48px;
+    background:radial-gradient(80% 90% at 14% 10%, rgba(224,177,94,.16), transparent 60%), linear-gradient(180deg,#15100C,#0E0A07)}
+  header .eyebrow{font-size:.74rem; letter-spacing:.22em; text-transform:uppercase; color:var(--brown); font-weight:500}
+  header h1{font-size:clamp(2.1rem,5vw,3.2rem); margin:.5rem 0 0; text-wrap:balance}
+  header p{color:var(--parchment-dim); margin-top:1rem; max-width:40em; font-size:1.05rem}
+
+  .reality{margin:38px 0; padding:24px 28px; border:1px solid var(--line-strong); border-radius:3px; background:var(--ink-2);
+    display:flex; gap:18px; align-items:flex-start}
+  .reality .big{font-family:var(--serif); font-size:2.4rem; color:var(--amber-bright); line-height:1; flex-shrink:0}
+  .reality p{color:var(--parchment); font-size:1.02rem; margin:0}
+  .reality b{color:var(--amber-bright); font-weight:500}
+
+  .phase{margin:46px 0; border-top:1px solid var(--line); padding-top:34px}
+  .phase-head{display:flex; gap:18px; align-items:baseline; margin-bottom:18px}
+  .phase-num{font-family:var(--serif); font-size:1.1rem; color:var(--ink); background:var(--amber); width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:500}
+  .phase h2{font-size:1.7rem}
+  .phase .sub{color:var(--muted); font-size:.86rem; margin-top:2px}
+
+  ul.checks{list-style:none; margin:14px 0 0}
+  ul.checks li{position:relative; padding:9px 0 9px 34px; color:var(--parchment-dim); border-bottom:1px solid var(--line); font-size:1rem}
+  ul.checks li:last-child{border-bottom:none}
+  ul.checks li::before{content:""; position:absolute; left:0; top:13px; width:16px; height:16px; border:1.5px solid var(--brown); border-radius:3px}
+  ul.checks li b, ul.checks li strong{color:var(--parchment); font-weight:500}
+
+  .callout{margin-top:16px; padding:14px 18px; border:1px solid var(--line); border-radius:3px; background:var(--ink-3); font-size:.92rem; color:var(--muted)}
+  .callout b{color:var(--parchment)}
+
+  table.dd{width:100%; border-collapse:collapse; margin-top:18px; font-size:.94rem}
+  table.dd th{text-align:left; padding:12px 14px; font-family:var(--sans); font-weight:500; font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; border-bottom:1px solid var(--line-strong)}
+  table.dd th.do{color:var(--success)} table.dd th.dont{color:var(--error)}
+  table.dd td{padding:10px 14px; vertical-align:top; color:var(--parchment-dim); border-bottom:1px solid var(--line); width:50%}
+
+  ol.paths{list-style:none; counter-reset:p; margin-top:14px}
+  ol.paths li{counter-increment:p; position:relative; padding:14px 0 14px 46px; border-bottom:1px solid var(--line); color:var(--parchment-dim)}
+  ol.paths li:last-child{border-bottom:none}
+  ol.paths li::before{content:counter(p); position:absolute; left:0; top:14px; width:28px; height:28px; border:1px solid var(--amber); color:var(--amber); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.85rem}
+  ol.paths li b{color:var(--parchment); font-weight:500}
+
+  .fit{margin:46px 0; padding:26px 30px; border:1px solid rgba(201,162,75,.3); border-radius:3px; background:radial-gradient(120% 120% at 100% 0%, rgba(201,162,75,.07), transparent 60%), var(--ink-2)}
+  .fit h2{font-size:1.4rem; margin-bottom:10px}
+  .fit p{color:var(--parchment-dim)}
+
+  .sources{margin:46px 0 0; border-top:1px solid var(--line); padding-top:28px}
+  .sources h3{font-size:.74rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); font-family:var(--sans); font-weight:500; margin-bottom:14px}
+  .sources ul{list-style:none; columns:2; column-gap:32px; font-size:.84rem}
+  @media(max-width:680px){.sources ul{columns:1}}
+  .sources li{margin-bottom:8px; break-inside:avoid}
+
+  footer{padding:40px 0 70px; color:var(--muted); font-size:.8rem}
+  .grain{position:fixed; inset:0; z-index:80; pointer-events:none; opacity:.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Meher Yar Khan · Screenwriting</p>
+    <h1>After the Script — your path to representation</h1>
+    <p>A research-backed roadmap for turning your completed feature into representation, and where this website actually fits.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="reality">
+    <div class="big">10%</div>
+    <p><b>The honest frame.</b> Your website is about <b>10%</b> of this — a credibility backstop, <em>not</em> how reps find you. No authoritative source lists a personal website as a discovery channel. The other <b>90%</b> is the script being undeniable, plus the real paths below. Your debut-novel credential is genuine, rare validation — lead with it everywhere.</p>
+  </div>
+
+  <section class="phase">
+    <div class="phase-head"><div class="phase-num">0</div><div><h2>Protect it first</h2><div class="sub">Before anything goes public, or you send the script anywhere</div></div></div>
+    <ul class="checks">
+      <li><b>Register with the US Copyright Office</b> (~$45–65, electronic). The only protection with legal teeth — required before you can sue, statutory damages up to $150,000. <strong>Mandatory.</strong></li>
+      <li><b>(Optional) WGA Registry</b> (~$10–25, renews every 5 years) — a timestamp for credit disputes. A supplement, not a substitute.</li>
+      <li><b>Skip "poor man's copyright"</b> (mailing yourself a copy) — the Copyright Office says it provides no protection. Worthless.</li>
+      <li><b>Gate the script</b> — share a watermarked PDF on request only. Never a public download.</li>
+    </ul>
+  </section>
+
+  <section class="phase">
+    <div class="phase-head"><div class="phase-num">1</div><div><h2>Make the script undeniable</h2><div class="sub">The script is the real gate</div></div></div>
+    <ul class="checks">
+      <li>Polish to a <b>"couldn't put it down"</b> level. One top manager requests ~80 of 100 query scripts but is impressed by <b>less than one a week</b> — access isn't the bottleneck, the writing is.</li>
+      <li>Over time, build toward <b>2–3 polished scripts</b> — most reps want more than one sample. One feature makes the near-term value <em>credibility</em> while you grow the slate.</li>
+    </ul>
+  </section>
+
+  <section class="phase">
+    <div class="phase-head"><div class="phase-num">2</div><div><h2>Build your professional presence</h2><div class="sub">The brochure + showcase</div></div></div>
+    <ul class="checks">
+      <li><b>Set up IMDbPro</b> — closer to mandatory than a personal site; the "online resume" reps check.</li>
+      <li><b>The /screen page</b> (we'll build it): logline · synopsis · themes · comparables · status ("completed feature — seeking representation") · bio leading with the novel credential · a <em>separate</em> industry contact path. Framed as "Selected Work" so it can grow.</li>
+    </ul>
+    <table class="dd">
+      <thead><tr><th class="do">✅ Do put online</th><th class="dont">✕ Don't put online</th></tr></thead>
+      <tbody>
+        <tr><td>Logline (1–2 sentences)</td><td>The full screenplay as a public PDF</td></tr>
+        <tr><td>Short synopsis (longer on request)</td><td>A direct, ungated link to the script</td></tr>
+        <tr><td>Genre · tone · themes</td><td>A cold "read my screenplay" ask</td></tr>
+        <tr><td>Comparables ("in the vein of…")</td><td>Excerpts that reconstruct the script</td></tr>
+        <tr><td>Status: "Completed — read on request"</td><td>Anything before US Copyright is filed</td></tr>
+        <tr><td>Pro contact route + IMDb link</td><td>Anything implying it's been widely shopped</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="phase">
+    <div class="phase-head"><div class="phase-num">3</div><div><h2>Pursue representation</h2><div class="sub">The real 90% — in order of power</div></div></div>
+    <ol class="paths">
+      <li><b>Referrals (strongest).</b> An intro from anyone in publishing/film goes to the top of the pile. Use every contact your novel and network give you.</li>
+      <li><b>Competitions / fellowships</b> the industry watches — Austin Film Festival, ScreenCraft, PAGE, Final Draft Big Break; <b>Academy Nicholl</b> (now via partner programs only).</li>
+      <li><b>The Black List</b> (<a href="https://blcklst.com">blcklst.com</a>) — a rare <b>8+ score</b> gets you circulated. Useful, not a plan by itself.</li>
+      <li><b>Targeted queries to managers + junior agents</b> (not top agents first). Find them via <b>IMDbPro</b> and <b>It's on the Grid</b>. Query = logline + genre + one-paragraph synopsis + validation.</li>
+    </ol>
+    <div class="callout"><b>2026 notes:</b> Coverfly shut down (Aug 2025) — its role moved to FilmFreeway, the Black List, ISA, and Script Revolution. Nicholl is now partner-programs-only.</div>
+  </section>
+
+  <div class="fit">
+    <h2>How the website fits</h2>
+    <p>The site's job is to <b style="color:var(--parchment)">not lose</b> a warm lead, not to generate one. When a rep you've queried — or who saw your contest placement — Googles you, the /screen page + IMDbPro make you look like a serious, finishing writer with a coherent voice, and make your logline and contact effortless to grab. That's the whole job. Build it well, then spend your real energy on Phases 0–3.</p>
+  </div>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <ul>
+      <li><a href="https://www.copyright.gov/registration/">US Copyright Office — registration</a></li>
+      <li><a href="https://www.wgawregistry.org/">WGA Registry</a></li>
+      <li><a href="https://www.plagiarismtoday.com/2024/05/22/where-did-the-poor-mans-copyright-myth-start/">"Poor man's copyright" myth</a></li>
+      <li><a href="https://leejessup.com/anatomy-of-a-spec-screenplay-or-pilot-sale/">Lee Jessup — Anatomy of a Spec Sale</a></li>
+      <li><a href="https://screencraft.org/blog/how-to-really-get-representation-for-your-writing-1/">ScreenCraft — Getting representation</a></li>
+      <li><a href="https://www.scriptreaderpro.com/how-to-get-a-screenwriting-agent/">ScriptReaderPro — Get an agent/manager</a></li>
+      <li><a href="https://johnaugust.com/2003/how-i-got-my-agent">John August — How I got my agent</a></li>
+      <li><a href="https://www.finaldraft.com/blog/rock-your-screenwriting-website">Final Draft — Screenwriting website</a></li>
+      <li><a href="https://www.flyingwrestler.com/2025/10/the-black-list-for-screenwriters/">Erik Bork — The Black List</a></li>
+      <li><a href="https://www.socreate.it/en/blogs/screenwriting/how-to-find-an-agent-or-manager-using-imdb-pro">IMDbPro for finding reps</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer><div class="wrap">Roadmap · MyKhanWrites · 2026-06-25 · supports the build, doesn't replace the work.</div></footer>
+</body>
+</html>
