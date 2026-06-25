@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Back shortly — Meher Yar Khan</title>
+    <style>
+      /* =========================================================
+         maintenance.html — fully self-contained (inline CSS only)
+         Dusk palette: ink background · parchment text · amber accent
+         No external assets — renders during a 503 when the rest
+         of the site is unavailable.
+         ========================================================= */
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --ink:        #14110F;
+        --ink-2:      #1B1714;
+        --parchment:  #ECE3D2;
+        --parchment-dim: #C7BCA8;
+        --amber:      #C9A24B;
+        --muted:      #A49A88;
+      }
+
+      html {
+        height: 100%;
+        background-color: var(--ink);
+      }
+
+      body {
+        min-height: 100%;
+        background-color: var(--ink);
+        color: var(--parchment);
+        font-family: Georgia, 'Times New Roman', serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        line-height: 1.6;
+      }
+
+      .crane {
+        color: var(--amber);
+        margin-bottom: 2rem;
+        opacity: 0.85;
+      }
+
+      .wordmark {
+        font-size: clamp(0.7rem, 2vw, 0.85rem);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 2.5rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-weight: 400;
+      }
+
+      .heading {
+        font-size: clamp(1.8rem, 5vw, 2.6rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        color: var(--parchment);
+        margin-bottom: 1.25rem;
+      }
+
+      .body {
+        font-size: clamp(1rem, 2.5vw, 1.1rem);
+        color: var(--parchment-dim);
+        max-width: 36ch;
+        margin: 0 auto 2.5rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-weight: 300;
+        line-height: 1.65;
+      }
+
+      .accent {
+        color: var(--amber);
+      }
+
+      .divider {
+        width: 2rem;
+        height: 1px;
+        background-color: var(--amber);
+        opacity: 0.4;
+        margin: 0 auto 2.5rem;
+      }
+
+      .footer-note {
+        font-size: 0.8rem;
+        color: var(--muted);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .crane {
+          animation: gentle-rise 1.2s ease-out both;
+        }
+        .heading, .body {
+          animation: gentle-rise 1.2s ease-out 0.15s both;
+        }
+        @keyframes gentle-rise {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0);   }
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Crane mark — origami crane line art, inline SVG, amber stroke -->
+    <div class="crane" aria-hidden="true">
+      <svg
+        width="52"
+        height="52"
+        viewBox="0 0 100 100"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <!-- Origami crane — body (main triangular hull) -->
+        <path d="M50 72 L22 55 L50 38 L78 55 Z" />
+        <!-- Raised left wing -->
+        <path d="M50 38 L18 26 L22 55" />
+        <!-- Right wing extension -->
+        <path d="M50 38 L82 26 L78 55" />
+        <!-- Head and beak -->
+        <path d="M78 55 L88 43 L92 46" />
+        <!-- Tail -->
+        <path d="M22 55 L10 66" />
+      </svg>
+    </div>
+
+    <p class="wordmark">Meher Yar Khan</p>
+
+    <h1 class="heading">Back shortly.</h1>
+
+    <div class="divider" aria-hidden="true"></div>
+
+    <p class="body">
+      Something quiet is being tended to.<br />
+      The site will return <span class="accent">soon</span> — check back in a little while.
+    </p>
+
+    <p class="footer-note">mykhanwrites.com</p>
+  </body>
+</html>

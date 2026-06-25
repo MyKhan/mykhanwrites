@@ -145,24 +145,45 @@ SetEnvIf Request_URI "^/404\.html$"         allow_public
 # ── END CACHING HEADERS ──────────────────────────────────────────────────────
 
 
-# ── MAINTENANCE / 503 STUB (PHASE 13 — CURRENTLY INERT) ─────────────────────
-# When Phase 13 (maintenance mode) is needed:
-#   1. Create public_html/maintenance.html with the maintenance page HTML.
-#   2. Uncomment the block below.
-#   3. Replace YOUR_IP with the server admin's IP to allow bypass.
-#   4. Re-comment when maintenance is over.
+# ── MAINTENANCE MODE — 503 TOGGLE (DISABLED BY DEFAULT) ─────────────────────
 #
-# IMPORTANT: This block is entirely commented out and has NO effect right now.
-# Do NOT uncomment until Phase 13 is implemented.
+# DEFAULT STATE: this entire block is commented out → site is live as normal.
 #
+# TO ENABLE MAINTENANCE MODE:
+#   1. Uncomment every line in the block below (remove the leading #).
+#   2. Replace 0\.0\.0\.0 with your actual public IP (the owner bypass).
+#      Find your IP: curl https://checkip.amazonaws.com
+#   3. Upload the updated .htaccess to public_html/ — maintenance mode is
+#      immediately active. All visitors see maintenance.html with HTTP 503.
+#      Your IP bypasses the redirect and sees the live site.
+#
+# TO DISABLE MAINTENANCE MODE:
+#   1. Re-comment the block (add # back to every line).
+#   2. Upload the updated .htaccess to public_html/.
+#
+# NOTES:
+#   - maintenance.html must be present at public_html/maintenance.html
+#   - The 503 + Retry-After signals to crawlers: temporary, come back in 1 hr.
+#   - This block must sit AFTER mod_rewrite is already On (see URL REWRITING
+#     block above) — or use its own RewriteEngine On (duplicates are harmless).
+#   - The Basic-Auth gate block above is independent; keep it intact.
+#
+# --- MAINTENANCE MODE: uncomment the block below to enable ---
 # <IfModule mod_rewrite.c>
 #   RewriteEngine On
-#   # Allow owner IP to bypass maintenance page
-#   RewriteCond %{REMOTE_ADDR} !^YOUR_IP$
-#   # Skip if the request IS the maintenance page (prevents redirect loop)
+#   # Owner-IP bypass — replace 0\.0\.0\.0 with your real public IP
+#   RewriteCond %{REMOTE_ADDR} !^0\.0\.0\.0$
+#   # Do not redirect the maintenance page itself (prevents a redirect loop)
 #   RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+#   # Do not redirect static assets that maintenance.html does NOT need
+#   # (maintenance.html is fully self-contained — no external CSS/JS/images)
 #   RewriteRule ^ /maintenance.html [R=503,L]
 #   ErrorDocument 503 /maintenance.html
 # </IfModule>
+# <IfModule mod_headers.c>
+#   # Tell crawlers and CDNs this is temporary — retry in 1 hour (503 only)
+#   Header always set Retry-After "3600" "expr=%{REQUEST_STATUS} == 503"
+# </IfModule>
+# --- END MAINTENANCE MODE BLOCK ---
 
-# ── END MAINTENANCE STUB ─────────────────────────────────────────────────────
+# ── END MAINTENANCE TOGGLE ───────────────────────────────────────────────────
