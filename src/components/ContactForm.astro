@@ -1,0 +1,311 @@
+---
+/**
+ * ContactForm.astro — Contact form (structurally complete; submit wiring is Phase 10)
+ *
+ * Fields: Name · Email · Reason (select, from site.contactReasons) · Message · Send
+ * Honeypot: hidden "botcheck" field (aria-hidden, tabindex=-1)
+ *
+ * Reason pre-select (Triage T8):
+ *   A client script bound on `astro:page-load` reads ?reason from the URL and
+ *   pre-selects the matching <option> (case-insensitive substring match).
+ *   e.g. ?reason=screen → selects "Film / screen".
+ *   Degrades cleanly when no param is present.
+ *   Bound on astro:page-load so it fires on both initial load AND View-Transitions nav.
+ *
+ * Success/error markup:
+ *   site.states.contactSuccess / site.states.contactError
+ *   Shown/hidden by the Phase-10 submit handler.
+ *
+ * Phase 10 TODO:
+ *   - Wire the <form action> to Web3Forms endpoint
+ *   - Add access_key hidden field (value from env var)
+ *   - Implement client fetch + show/hide success/error states
+ *   - Add Umami data-umami-event="contact-submit" on the Send button
+ *
+ * Accessibility:
+ *   ≥44px tap targets; amber focus ring; field border warms to amber on focus; labelled inputs.
+ */
+
+import { site } from '../lib/data';
+import { obfuscateEmail, makeMailtoHref } from '../lib/obfuscate';
+
+const encodedEmail = obfuscateEmail(site.contactEmail);
+const mailtoHref = makeMailtoHref(site.contactEmail);
+---
+
+<!-- Phase 10: replace action="#" with Web3Forms endpoint, add access_key hidden field -->
+<form
+  class="contact-form"
+  method="POST"
+  action="#"
+  aria-label="Contact form"
+  data-astro-reload
+>
+  <!-- Phase 10: uncomment and populate from env var
+  <input type="hidden" name="access_key" value={import.meta.env.PUBLIC_WEB3FORMS_KEY} />
+  -->
+
+  <!-- Honeypot — hidden from users + screen readers; bots fill it in -->
+  <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">
+    <label for="botcheck">Leave this empty</label>
+    <input
+      id="botcheck"
+      type="text"
+      name="botcheck"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
+
+  <!-- Name -->
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="cf-name">Name</label>
+    <input
+      id="cf-name"
+      class="contact-form__input"
+      type="text"
+      name="name"
+      autocomplete="name"
+      required
+      placeholder="Your name"
+    />
+  </div>
+
+  <!-- Email -->
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="cf-email">Email</label>
+    <input
+      id="cf-email"
+      class="contact-form__input"
+      type="email"
+      name="email"
+      autocomplete="email"
+      required
+      placeholder="your@email.com"
+    />
+  </div>
+
+  <!-- Reason -->
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="cf-reason">Reason</label>
+    <select
+      id="cf-reason"
+      class="contact-form__select"
+      name="reason"
+    >
+      <option value="">Select a reason…</option>
+      {site.contactReasons.map((reason) => (
+        <option value={reason}>{reason}</option>
+      ))}
+    </select>
+  </div>
+
+  <!-- Message -->
+  <div class="contact-form__field">
+    <label class="contact-form__label" for="cf-message">Message</label>
+    <textarea
+      id="cf-message"
+      class="contact-form__textarea"
+      name="message"
+      rows="6"
+      required
+      placeholder="Your message…"
+    ></textarea>
+  </div>
+
+  <!-- Submit -->
+  <button type="submit" class="contact-form__submit">
+    Send
+  </button>
+
+  <!-- Success state — Phase 10 submit handler shows this on success -->
+  <div class="contact-form__success" role="status" aria-live="polite" hidden>
+    <p>{site.states.contactSuccess}</p>
+  </div>
+
+  <!-- Error state — Phase 10 submit handler shows this on failure -->
+  <div class="contact-form__error" role="alert" aria-live="assertive" hidden>
+    <p>
+      {site.states.contactError.prefix}<a href={mailtoHref} set:html={encodedEmail} />{site.states.contactError.suffix}
+    </p>
+  </div>
+</form>
+
+<!-- Reason pre-select: bound on astro:page-load (fires on first load + View-Transitions nav).
+     Reads ?reason param, matches case-insensitively against option text, pre-selects if found.
+     Degrades cleanly with no param. -->
+<script>
+  function applyReasonPreselect() {
+    const param = new URLSearchParams(location.search).get('reason');
+    if (!param) return;
+
+    const select = document.getElementById('cf-reason') as HTMLSelectElement | null;
+    if (!select) return;
+
+    const needle = param.toLowerCase();
+    for (const option of Array.from(select.options)) {
+      if (option.text.toLowerCase().includes(needle)) {
+        option.selected = true;
+        break;
+      }
+    }
+  }
+
+  document.addEventListener('astro:page-load', applyReasonPreselect);
+</script>
+
+<style>
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    max-width: var(--measure);
+  }
+
+  .contact-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .contact-form__label {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-parchment-dim);
+  }
+
+  /* Shared input/select/textarea styles */
+  .contact-form__input,
+  .contact-form__select,
+  .contact-form__textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.65em 1em;
+    border-radius: var(--radius-sm, 4px);
+    border: 1px solid rgba(236, 227, 210, 0.22);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--color-parchment);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 300;
+    transition: border-color var(--t) var(--ease-out);
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  .contact-form__input::placeholder,
+  .contact-form__textarea::placeholder {
+    color: var(--color-muted);
+  }
+
+  /* Border warms to amber on focus */
+  .contact-form__input:focus,
+  .contact-form__select:focus,
+  .contact-form__textarea:focus {
+    border-color: var(--color-amber);
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+
+  .contact-form__select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239A8B7A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9em center;
+    padding-right: 2.5em;
+    cursor: pointer;
+  }
+
+  .contact-form__select option {
+    background: var(--color-ink, #14110F);
+    color: var(--color-parchment);
+  }
+
+  .contact-form__textarea {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.65;
+  }
+
+  /* Submit — amber, ≥44px tap target */
+  .contact-form__submit {
+    align-self: flex-start;
+    min-height: 44px;
+    padding: 0.65em 2em;
+    border-radius: var(--radius-sm, 4px);
+    border: 1px solid var(--color-amber);
+    background: var(--color-amber);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background var(--t),
+      border-color var(--t),
+      transform var(--t) var(--ease-out);
+  }
+
+  .contact-form__submit:hover {
+    background: var(--color-amber-bright, #d4a843);
+    border-color: var(--color-amber-bright, #d4a843);
+    transform: translateY(-1px);
+  }
+
+  .contact-form__submit:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 3px;
+  }
+
+  /* Success / error states */
+  .contact-form__success,
+  .contact-form__error {
+    padding: 1em 1.2em;
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .contact-form__success {
+    border: 1px solid rgba(201, 162, 75, 0.35);
+    background: rgba(201, 162, 75, 0.08);
+    color: var(--color-parchment-dim);
+  }
+
+  .contact-form__error {
+    border: 1px solid rgba(180, 80, 60, 0.35);
+    background: rgba(180, 80, 60, 0.08);
+    color: var(--color-parchment-dim);
+  }
+
+  .contact-form__success p,
+  .contact-form__error p {
+    margin: 0;
+  }
+
+  .contact-form__error a {
+    color: var(--color-parchment);
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    transition: color var(--t), border-color var(--t);
+  }
+
+  .contact-form__error a:hover {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+
+  /* Mobile 380px */
+  @media (max-width: 420px) {
+    .contact-form__submit {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>

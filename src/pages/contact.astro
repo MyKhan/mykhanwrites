@@ -1,0 +1,135 @@
+---
+/**
+ * contact.astro — /contact page (copy §5)
+ *
+ * §5 intro copy lives in site.contact.intro (site.json) as a token string:
+ *   "Notes from readers are always welcome … write to {email}. … visit {manTalksMedia}."
+ * {email}          → obfuscated hello@mykhanwrites.com (obfuscateEmail + set:html)
+ * {manTalksMedia}  → <a href="https://mantalksmedia.com">ManTalksMedia</a>
+ *
+ * Title/description come from contact.md frontmatter (getEntry('pages','contact')).
+ * The contact.md body is intentionally empty — intro moved to site.json.
+ *
+ * ManTalksMedia links to https://mantalksmedia.com.
+ */
+
+import { getEntry } from 'astro:content';
+import { site } from '../lib/data';
+import { obfuscateEmail, makeMailtoHref } from '../lib/obfuscate';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import Container from '../components/Container.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import ContactForm from '../components/ContactForm.astro';
+
+const page = await getEntry('pages', 'contact');
+const { title, description } = page.data;
+
+const encodedEmail = obfuscateEmail(site.contactEmail);
+const mailtoHref = makeMailtoHref(site.contactEmail);
+
+// Split the intro on tokens to compose with obfuscated email + ManTalksMedia link.
+// Template: "…write to {email}. For media and commercial work, visit {manTalksMedia}."
+const intro = site.contact.intro;
+const introParts = intro.split('{email}');
+const beforeEmail = introParts[0] ?? '';
+const afterEmailFull = introParts[1] ?? '';
+const mtmParts = afterEmailFull.split('{manTalksMedia}');
+const beforeMtm = mtmParts[0] ?? '';
+const afterMtm = mtmParts[1] ?? '';
+---
+
+<BaseLayout title={title} description={description}>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       1. PAGE HERO — eyebrow + h1
+  ═══════════════════════════════════════════════════════════════ -->
+  <section class="contact-hero">
+    <Container>
+      <Eyebrow tone="eyebrow">Get in touch</Eyebrow>
+      <h1 class="contact-hero__heading">Contact</h1>
+    </Container>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       2. §5 INTRO + CONTACT FORM
+          Intro text is verbatim §5 copy from site.contact.intro,
+          composed here so the email is injected via set:html
+          (HTML entities) — NOT plaintext.
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="contact-form">
+    <div class="contact-layout">
+      <div class="contact-intro">
+        <p class="contact-intro__text">
+          {beforeEmail}<a href={mailtoHref} set:html={encodedEmail} class="contact-intro__email" />{beforeMtm}<a
+            href="https://mantalksmedia.com"
+            class="contact-intro__link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >ManTalksMedia</a>{afterMtm}
+        </p>
+      </div>
+
+      <ContactForm />
+    </div>
+  </Section>
+
+</BaseLayout>
+
+<style>
+  /* ── Hero ──────────────────────────────────────────────────────── */
+  .contact-hero {
+    padding-block: clamp(64px, 9vh, 120px) clamp(32px, 4vh, 56px);
+  }
+
+  .contact-hero__heading {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 430;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-parchment);
+    margin: 0.5rem 0 0;
+  }
+
+  /* ── Layout ────────────────────────────────────────────────────── */
+  .contact-layout {
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  /* ── Intro copy ────────────────────────────────────────────────── */
+  .contact-intro__text {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--color-parchment-dim);
+    margin: 0;
+  }
+
+  .contact-intro__email,
+  .contact-intro__link {
+    color: var(--color-parchment);
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    padding-bottom: 1px;
+    transition:
+      color var(--t),
+      border-color var(--t);
+  }
+
+  .contact-intro__email:hover,
+  .contact-intro__link:hover {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+
+  .contact-intro__email:focus-visible,
+  .contact-intro__link:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+</style>

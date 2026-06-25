@@ -3,7 +3,7 @@ title: "About — Meher Yar Khan"
 description: "Pakistani-Finnish writer, engineer, and digital nomad. The story behind the first novel, They Only Came When It Rained."
 ---
 
-Meher Yar Khan is a Pakistani-Finnish writer and digital nomad. His first novel, *They Only Came When It Rained* — a quiet, contemplative story about people who can't move on — arrives in August 2026. By training he's an electrical and software engineer, and he builds writing tools, including Compare My Drafts, a web app for taking a draft from a messy first pass to a finished one.
+Meher Yar Khan is a Pakistani-Finnish writer and digital nomad. His first novel, *They Only Came When It Rained* — a quiet, contemplative story about people who can't move on — arrives in August 2026. By training he's an electrical and software engineer, and he builds writing tools, including [Compare My Drafts](https://comparemydrafts.com), a web app for taking a draft from a messy first pass to a finished one.
 
 ## A note from me
 

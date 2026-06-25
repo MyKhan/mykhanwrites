@@ -1,0 +1,213 @@
+---
+/**
+ * about.astro — /about page (copy §4)
+ *
+ * Sections:
+ *   1. Page hero — eyebrow + h1
+ *   2. Author photo placeholder [PENDING] — tonal block, role="img" + aria-label reachable
+ *   3. Bio + "A note from me" — rendered from about.md body via content collection
+ *      "Compare My Drafts" links → https://comparemydrafts.com (link added in about.md)
+ *      Leave data-umami-event hook for Phase-10 writing-tool-outbound event on that link
+ *   4. CTAs — LettersForm(full) + ArrowLink "Read about the novel →" → /novel/
+ *
+ * Person JSON-LD: Phase 11 — do NOT add here.
+ */
+
+import { getEntry, render } from 'astro:content';
+import { site } from '../lib/data';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import Container from '../components/Container.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import ArrowLink from '../components/primitives/ArrowLink.astro';
+import LettersForm from '../components/LettersForm.astro';
+
+const aboutEntry = await getEntry('pages', 'about');
+const { title, description } = aboutEntry.data;
+const { Content } = await render(aboutEntry);
+---
+
+<BaseLayout title={title} description={description}>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       1. PAGE HERO — eyebrow kicker + h1
+  ═══════════════════════════════════════════════════════════════ -->
+  <section class="about-hero">
+    <Container>
+      <Eyebrow tone="eyebrow">Meher Yar Khan · Writer</Eyebrow>
+      <h1 class="about-hero__heading">About</h1>
+    </Container>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       2. AUTHOR PHOTO PLACEHOLDER [PENDING]
+          role="img" + aria-label REACHABLE (not under aria-hidden).
+          When photo is ready: replace this div with <img>.
+  ═══════════════════════════════════════════════════════════════ -->
+  <section class="about-photo-section">
+    <Container>
+      <div
+        class="about-photo-placeholder"
+        role="img"
+        aria-label={site.authorPhotoAlt}
+      >
+        <!-- [PENDING] Author photo — replace with <img> when available -->
+        <span class="about-photo-placeholder__label" aria-hidden="true">
+          Photo coming soon
+        </span>
+      </div>
+    </Container>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       3. BIO + "A NOTE FROM ME" — from about.md body
+          Rendered via Astro content collection render().
+          about.md contains §4.1 bio + §4.2 "A note from me" verbatim.
+          "Compare My Drafts" links → comparemydrafts.com (linked in about.md).
+          data-umami-event="writing-tool-outbound" hook: Phase 10 adds this
+          attribute to the Compare My Drafts anchor via a client script.
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="about-bio">
+    <div class="about-prose">
+      <Content />
+    </div>
+  </Section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       4. CTAs (Triage T10)
+          - LettersForm variant="full" (full newsletter spine)
+          - ArrowLink "Read about the novel →" → /novel/
+  ═══════════════════════════════════════════════════════════════ -->
+  <Section id="about-cta">
+    <div class="about-cta-inner">
+      <LettersForm variant="full" />
+
+      <div class="about-novel-link">
+        <ArrowLink href="/novel/">
+          Read about the novel →
+        </ArrowLink>
+      </div>
+    </div>
+  </Section>
+
+</BaseLayout>
+
+<style>
+  /* ── Hero ──────────────────────────────────────────────────────── */
+  .about-hero {
+    padding-block: clamp(64px, 9vh, 120px) clamp(32px, 4vh, 56px);
+  }
+
+  .about-hero__heading {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 430;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-parchment);
+    margin: 0.5rem 0 0;
+  }
+
+  /* ── Photo placeholder ─────────────────────────────────────────── */
+  .about-photo-section {
+    padding-block: clamp(24px, 3vh, 40px);
+  }
+
+  .about-photo-placeholder {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-sm, 4px);
+    background: linear-gradient(
+      160deg,
+      rgba(90, 69, 40, 0.35) 0%,
+      rgba(20, 17, 15, 0.7) 100%
+    );
+    border: 1px solid rgba(236, 227, 210, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .about-photo-placeholder__label {
+    font-family: var(--font-sans);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* ── Bio prose ─────────────────────────────────────────────────── */
+  .about-prose {
+    max-width: var(--measure);
+  }
+
+  .about-prose :global(p) {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--color-parchment-dim);
+    margin-block: 0 1.2rem;
+  }
+
+  .about-prose :global(p:last-child) {
+    margin-block-end: 0;
+  }
+
+  .about-prose :global(h2) {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-weight: 430;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: var(--color-parchment);
+    margin-block: 2rem 0.75rem;
+  }
+
+  .about-prose :global(em) {
+    font-style: italic;
+    color: var(--color-parchment);
+  }
+
+  .about-prose :global(a) {
+    color: var(--color-parchment);
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    padding-bottom: 1px;
+    transition:
+      color var(--t),
+      border-color var(--t);
+  }
+
+  .about-prose :global(a:hover) {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+
+  .about-prose :global(a:focus-visible) {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+
+  /* ── CTAs ──────────────────────────────────────────────────────── */
+  .about-cta-inner {
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .about-novel-link {
+    padding-block-start: 0.5rem;
+  }
+
+  /* ── Mobile 380px ──────────────────────────────────────────────── */
+  @media (max-width: 420px) {
+    .about-photo-placeholder {
+      max-width: 280px;
+    }
+  }
+</style>

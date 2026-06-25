@@ -1,0 +1,57 @@
+---
+/**
+ * letters.astro — /letters (reserved)
+ *
+ * Reserved route for the future on-site blog/letters home.
+ * Not linked from nav, footer, or sitemap.
+ * noindex: true — not intended for search engine indexing.
+ *
+ * Sitemap exclusion is finalised in Phase 11.
+ * Do NOT add to nav, footer, or sitemap.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/Container.astro';
+---
+
+<BaseLayout
+  title="Letters — Meher Yar Khan"
+  description="Letters from Meher Yar Khan — coming soon."
+  noindex
+  showFooterSignup={false}
+>
+  <section class="letters-reserved">
+    <Container>
+      <p class="letters-reserved__label">Letters</p>
+      <p class="letters-reserved__note">Coming soon.</p>
+    </Container>
+  </section>
+</BaseLayout>
+
+<style>
+  .letters-reserved {
+    display: flex;
+    align-items: center;
+    min-height: 50vh;
+    padding-block: clamp(80px, 12vh, 160px);
+  }
+
+  .letters-reserved__label {
+    font-family: var(--font-sans);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-amber);
+    margin: 0 0 0.75rem;
+  }
+
+  .letters-reserved__note {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-weight: 430;
+    color: var(--color-parchment-dim);
+    margin: 0;
+  }
+</style>

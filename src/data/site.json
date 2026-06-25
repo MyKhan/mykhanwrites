@@ -62,12 +62,21 @@
     "Media / commercial",
     "Other"
   ],
+  "contact": {
+    "intro": "Notes from readers are always welcome — they're the best part of doing this. For publishing, film, or rights enquiries, write to {email}. For media and commercial work, visit {manTalksMedia}."
+  },
   "states": {
     "newsletterSuccess": "Check your inbox — the first pages are on their way. (If nothing arrives, peek in spam and add me to your contacts.)",
     "newsletterError": "That didn't go through. Try again, or email hello@mykhanwrites.com.",
     "contactSuccess": "Thank you — your note's with me. I read everything, and I'll reply when I can.",
-    "contactError": "Something went wrong sending that. Email hello@mykhanwrites.com and it'll reach me.",
-    "notFound404": "This page took the last train out. Head back home →"
+    "contactError": {
+      "prefix": "Something went wrong sending that. Email ",
+      "suffix": " and it'll reach me."
+    },
+    "notFound404": {
+      "message": "This page took the last train out.",
+      "linkLabel": "Head back home →"
+    }
   },
   "pending": {
     "kitPending": "Newsletter signup launching soon — check back shortly.",

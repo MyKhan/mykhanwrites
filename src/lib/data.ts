@@ -56,14 +56,23 @@ const SiteSchema = z.object({
     tiktok: z.url().nullable(),
     x: z.url().nullable(),
   }),
+  contact: z.object({
+    intro: z.string(),
+  }),
   contactEmail: z.email(),
   contactReasons: z.array(z.string()),
   states: z.object({
     newsletterSuccess: z.string(),
     newsletterError: z.string(),
     contactSuccess: z.string(),
-    contactError: z.string(),
-    notFound404: z.string(),
+    contactError: z.object({
+      prefix: z.string(),
+      suffix: z.string(),
+    }),
+    notFound404: z.object({
+      message: z.string(),
+      linkLabel: z.string(),
+    }),
   }),
   pending: z.object({
     kitPending: z.string(),
