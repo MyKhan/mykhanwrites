@@ -1,0 +1,39 @@
+---
+/**
+ * QuietLink.astro
+ *
+ * Styleguide lock: `.quiet` selector in mockups/styleguide.html
+ *
+ * Near-silent tertiary action — e.g. "Meet the author".
+ * Muted color resting; warms to parchment on hover.
+ *
+ * Pass-through: `class`, `aria-*`, `data-*` (Phase 10 adds data-umami-event).
+ */
+
+interface Props {
+  href: string;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { href, class: className, ...rest } = Astro.props;
+---
+
+<a href={href} class:list={['quiet', className]} {...rest}>
+  <slot />
+</a>
+
+<style>
+  .quiet {
+    font-size: .86rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--t);
+  }
+
+  .quiet:hover {
+    color: var(--color-parchment);
+  }
+
+  /* Focus-visible ring is inherited from global.css *:focus-visible rule */
+</style>

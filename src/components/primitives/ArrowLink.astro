@@ -1,0 +1,44 @@
+---
+/**
+ * ArrowLink.astro
+ *
+ * Styleguide lock: `.arrow` selector in mockups/styleguide.html
+ *
+ * For "Read about the novel →"-style links. The arrow glyph is NOT
+ * auto-injected — the copy supplies "→" in the slot text.
+ *
+ * Pass-through: `class`, `aria-*`, `data-*` (Phase 10 adds data-umami-event).
+ */
+
+interface Props {
+  href: string;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { href, class: className, ...rest } = Astro.props;
+---
+
+<a href={href} class:list={['arrow', className]} {...rest}>
+  <slot />
+</a>
+
+<style>
+  .arrow {
+    font-size: .9rem;
+    color: var(--color-parchment);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 3px;
+    text-decoration: none;
+    transition:
+      color var(--t),
+      border-color var(--t);
+  }
+
+  .arrow:hover {
+    color: var(--color-amber);
+    border-color: var(--color-amber);
+  }
+
+  /* Focus-visible ring is inherited from global.css *:focus-visible rule */
+</style>

@@ -1,0 +1,110 @@
+---
+/**
+ * Reveal.astro
+ *
+ * Styleguide lock: `.reveal` / `.reveal.in` selectors in mockups/styleguide.html
+ *
+ * Scroll-reveal wrapper: opacity 0→1 + translateY(18px)→0 when the element
+ * enters the viewport. Fires once per element (unobserve after trigger).
+ *
+ * Lifecycle (V4 — View Transitions safe):
+ *   The IntersectionObserver is set up in a SINGLE site-wide <script> that
+ *   (re)binds on `astro:page-load`. This event fires:
+ *     1. On the very first page load (DOMContentLoaded equivalent for Astro)
+ *     2. After EVERY View-Transitions SPA navigation
+ *   Inline <script> tags only run once on first load, so binding to
+ *   `astro:page-load` is the correct V4 pattern for this project's
+ *   <ClientRouter /> setup.
+ *
+ *   On each `astro:page-load`:
+ *     - Re-query all `.reveal` elements
+ *     - Observe only those not yet revealed (no `.in` class)
+ *     - Elements already revealed are skipped (idempotent)
+ *
+ * Reduced-motion:
+ *   The global reduced-motion block in global.css collapses all transitions
+ *   to 0.01ms. Separately, the CSS below sets `.reveal { opacity:1; transform:none }`
+ *   under prefers-reduced-motion, so elements show final state immediately
+ *   without waiting for the observer. The observer itself is harmless under
+ *   reduced-motion (adds `.in` which has no visible effect).
+ *
+ * Props:
+ *   class — pass-through for additional classes (e.g. delay utilities Phase 9 adds)
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['reveal', className]}>
+  <slot />
+</div>
+
+<style>
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity var(--t-reveal) var(--ease-out),
+      transform var(--t-reveal) var(--ease-out);
+  }
+
+  .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Under reduced motion: show final state immediately.
+     The global reduced-motion block also collapses transition-duration to 0.01ms,
+     so this is belt-and-suspenders — elements are visible either way. */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<!--
+  Site-wide IntersectionObserver script.
+
+  `is:inline` is intentionally NOT used here — this is a module script so Astro
+  deduplicates it across instances (only one copy in the bundle regardless of how
+  many <Reveal> components are on the page).
+
+  The `astro:page-load` listener ensures the observer is (re)initialized after
+  every View-Transitions navigation, not just the first page load.
+-->
+<script>
+  // ONE observer, allocated once at module scope.
+  // Re-entrancy is trivially correct: calling observer.observe() on an element
+  // that is already being observed is a no-op per the spec, so initReveal() can
+  // safely re-query and re-observe on every astro:page-load without accumulating
+  // duplicate callbacks or leaking memory.
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+
+  function initReveal() {
+    // Only pick up elements not yet revealed; already-revealed elements keep
+    // their `.in` class and are never re-observed.
+    document.querySelectorAll<HTMLElement>('.reveal:not(.in)').forEach((el) => {
+      observer.observe(el);
+    });
+  }
+
+  // astro:page-load fires on first load AND after every View-Transitions navigation.
+  // This is the correct V4 lifecycle hook for <ClientRouter /> projects.
+  document.addEventListener('astro:page-load', initReveal);
+</script>

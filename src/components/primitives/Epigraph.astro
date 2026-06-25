@@ -1,0 +1,39 @@
+---
+/**
+ * Epigraph.astro
+ *
+ * Styleguide lock: `.epi` selector in mockups/styleguide.html
+ *
+ * Pull quotes and literary epigraphs. Fraunces italic with 2px amber left-rule.
+ *
+ * The 2px amber left-rule is the SANCTIONED epigraph device (UI Kit §6).
+ * It is NOT the banned ">1px colored side-stripe" (that ban targets decorative
+ * stripes on cards/sections). Keep it.
+ *
+ * Pass-through: `class`.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<blockquote class:list={['epi', className]}>
+  <slot />
+</blockquote>
+
+<style>
+  .epi {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    color: var(--color-parchment);
+    border-left: 2px solid var(--color-amber);
+    padding-left: 20px;
+    max-width: 30em;
+    margin: 0;
+  }
+</style>

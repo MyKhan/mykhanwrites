@@ -1,0 +1,68 @@
+---
+/**
+ * PrimaryButton.astro
+ *
+ * Styleguide lock: `.btn` selector in mockups/styleguide.html
+ *
+ * Renders an <a> when `href` is provided; falls back to <button type="button">
+ * (or type="submit" when `submit` prop is set) for form actions.
+ *
+ * CONVENTION: Use at most ONE primary button per view. This is enforced by
+ * convention, not a runtime guard — the design system relies on authors to
+ * respect the single-primary-per-view rule.
+ *
+ * Pass-through: `class`, `aria-*`, `data-*` (Phase 10 adds data-umami-event).
+ */
+
+interface Props {
+  href?: string;
+  submit?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { href, submit = false, class: className, ...rest } = Astro.props;
+
+const tag = href ? 'a' : 'button';
+const type = !href ? (submit ? 'submit' : 'button') : undefined;
+---
+
+{tag === 'a' ? (
+  <a href={href} class:list={['btn', className]} {...rest}>
+    <slot />
+  </a>
+) : (
+  <button type={type} class:list={['btn', className]} {...rest}>
+    <slot />
+  </button>
+)}
+
+<style>
+  .btn {
+    display: inline-block;
+    padding: .95em 1.8em;
+    border-radius: var(--radius-sm);
+    font-size: .82rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    font-weight: 500;
+    border: 1px solid var(--color-amber);
+    color: var(--color-ink);
+    background: var(--color-amber);
+    transition:
+      transform var(--t) var(--ease-out),
+      background var(--t);
+    text-decoration: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    line-height: 1;
+  }
+
+  .btn:hover {
+    background: var(--color-amber-bright);
+    border-color: var(--color-amber-bright);
+    transform: translateY(-2px);
+  }
+
+  /* Focus-visible ring is inherited from global.css *:focus-visible rule */
+</style>
