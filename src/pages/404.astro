@@ -1,0 +1,64 @@
+---
+/**
+ * 404.astro — Not Found page
+ *
+ * Astro emits this as /404.html (flat file, not a directory) even in
+ * format:'directory' mode. This matches the .htaccess ErrorDocument directive:
+ *   ErrorDocument 404 /404.html
+ *
+ * Uses BaseLayout with default (non-minimal) chrome so the full site nav and
+ * footer are present — helps lost visitors find their way back.
+ *
+ * Phase 7 may refine the design; keep it simple and correct here.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../lib/data';
+---
+
+<BaseLayout
+  title="Page not found — MyKhanWrites"
+  description="The page you were looking for doesn't exist."
+  noindex
+>
+  <section class="not-found">
+    {/*
+      site.states.notFound404 = "This page took the last train out. Head back home →"
+      Render the full copy string, then provide "Head back home →" as a proper link.
+    */}
+    <p class="not-found__message">{site.states.notFound404}</p>
+    <a href="/" class="not-found__link">Head back home →</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40vh;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .not-found__message {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--color-ink, #1a1a1a);
+    max-width: 36ch;
+  }
+
+  .not-found__link {
+    font-size: 1rem;
+    color: var(--color-ink, #1a1a1a);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: opacity 0.15s ease;
+  }
+
+  .not-found__link:hover {
+    opacity: 0.6;
+  }
+</style>

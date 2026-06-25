@@ -14,3 +14,7 @@ dist/
 
 # Superpowers workspace (local only)
 .superpowers/
+
+# .htpasswd — NEVER commit the real password file (commit only .htpasswd.example)
+.htpasswd
+public/.htpasswd

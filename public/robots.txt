@@ -1,0 +1,17 @@
+# robots.txt — PRELAUNCH VERSION
+# Disallow all crawling while the site is password-protected and invite-only.
+# Belt-and-suspenders alongside the <meta name="robots" content="noindex,nofollow">
+# tag on the coming-soon page (M1a) and the Basic-Auth gate (.htaccess).
+#
+# LAUNCH FLIP: replace the Disallow line with the Allow block shown below.
+# Do this AFTER: PRELAUNCH=false rebuild + redeploy + Basic-Auth gate commented out.
+#
+# ── LAUNCH VERSION (replace this file's User-agent block at flip) ─────────────
+# User-agent: *
+# Allow: /
+#
+# Sitemap: https://www.mykhanwrites.com/sitemap-index.xml
+# ─────────────────────────────────────────────────────────────────────────────
+
+User-agent: *
+Disallow: /

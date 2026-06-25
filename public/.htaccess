@@ -1,0 +1,168 @@
+# ============================================================================
+# mykhanwrites.com — Apache .htaccess
+# Assembled for M1 prelaunch deployment on Hostinger (Apache 2.4, mod_rewrite,
+# mod_headers, mod_expires, mod_auth_basic, mod_setenvif).
+#
+# Build uses: format:'directory' + trailingSlash:'always'
+#   → /about/ is served from /about/index.html
+#   → Apache's DirectorySlash module auto-301s /about → /about/ (do not
+#     add manual slash-stripping; it fights DirectorySlash and breaks SEO)
+#
+# LAUNCH-FLIP CHECKLIST (run after PRELAUNCH=false rebuild + redeploy):
+#   1. Comment out the entire "── BASIC-AUTH GATE ──" block below.
+#   2. Swap robots.txt to the launch version (Allow: / + Sitemap line).
+#   3. Submit sitemap to Google Search Console.
+#   4. /screen stays password-protected until US Copyright is filed (C4).
+#      Re-enable the gate for /screen only after C4 is complete.
+# ============================================================================
+
+
+# ── CLEAN URLs / STATIC SITE BASICS ─────────────────────────────────────────
+# Disable content negotiation multiviews (they conflict with Astro routes).
+Options -MultiViews
+
+# Serve directory indexes (Astro emits /about/ → /about/index.html).
+DirectoryIndex index.html
+
+# Custom 404 page — Astro emits 404.astro → /404.html (flat, not a directory).
+# Must match the emitted path; do NOT use /404/ (that would 404-loop).
+ErrorDocument 404 /404.html
+
+
+# ── URL REWRITING ────────────────────────────────────────────────────────────
+# Needed only to serve /path/ from /path/index.html when DirectoryIndex alone
+# is not enough (some Hostinger configs). Kept minimal — do NOT add slash-
+# stripping rules; DirectorySlash handles /path → /path/ redirects natively.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # If the request is for an existing file or directory, serve it directly.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+</IfModule>
+
+
+# ── BASIC-AUTH GATE (prelaunch — allowlist coming-soon + shared assets) ──────
+#
+# DEFAULT: every request requires the preview password.
+# EXCEPTION: the coming-soon page (/) and its shared assets are public so the
+# invite-only coming-soon is visible without credentials.
+#
+# Apache 2.4 pattern: SetEnvIf sets allow_public on matching URIs BEFORE the
+# <RequireAny> block evaluates. <RequireAny> passes if EITHER:
+#   (a) allow_public is set (public asset — no password needed), OR
+#   (b) the user supplies a valid-user credential.
+# Everything not matched by SetEnvIf falls through to Require valid-user only.
+#
+# PUBLIC allow-list (ONLY these paths are reachable without a password):
+#   /              → the coming-soon page itself (index.html)
+#   /_astro/       → content-hashed CSS / JS / fonts (needed to render /)
+#   /favicon.svg   → tab icon
+#   /og/           → OG share image (needed for social previews of /)
+#   /robots.txt    → crawlers must be able to read this
+#   /404.html      → must be reachable so Apache can serve the 404 page
+#
+# LAUNCH FLIP: comment out this entire block (AuthType … </RequireAny> +
+# all SetEnvIf lines). The site then becomes fully public.
+# For /screen post-launch: restore this block scoped to /screen only (Phase C4).
+#
+# .htpasswd MUST live ABOVE public_html — NEVER inside it.
+# Typical Hostinger path: /home/REPLACE_ME/.htpasswd
+# Generate: htpasswd -c /home/REPLACE_ME/.htpasswd preview
+# Then update the AuthUserFile line below with the real absolute path.
+
+AuthType Basic
+AuthName "MyKhanWrites — private preview"
+AuthUserFile "/home/REPLACE_ME/.htpasswd"
+
+<RequireAny>
+  Require env allow_public
+  Require valid-user
+</RequireAny>
+
+# Coming-soon root (both /  and /index.html hit this)
+SetEnvIf Request_URI "^/(index\.html)?$"   allow_public
+# Content-hashed static assets (CSS, JS, fonts) — required to render /
+SetEnvIf Request_URI "^/_astro/"            allow_public
+# Favicon
+SetEnvIf Request_URI "^/favicon\.svg$"      allow_public
+# OG share image — allows social crawlers to render the preview card
+SetEnvIf Request_URI "^/og/"                allow_public
+# robots.txt — crawlers must read this even pre-auth
+SetEnvIf Request_URI "^/robots\.txt$"       allow_public
+# 404 page — Apache fetches this when serving ErrorDocument; must not auth-loop
+SetEnvIf Request_URI "^/404\.html$"         allow_public
+
+# ── END BASIC-AUTH GATE ──────────────────────────────────────────────────────
+
+
+# ── CACHING HEADERS ──────────────────────────────────────────────────────────
+# Content-hashed assets (_astro/*) are safe to cache for 1 year (immutable).
+# OG images and fonts change rarely — 30 days.
+# HTML pages: no-cache so updates propagate immediately.
+#
+# Both mod_headers and mod_expires are guarded — the site still works if either
+# module is absent, just without the caching optimisation.
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Content-hashed JS/CSS/fonts: 1 year (they change filename on rebuild)
+  <FilesMatch "\.(js|css|woff2?|ttf|otf|eot)$">
+    ExpiresDefault "access plus 1 year"
+  </FilesMatch>
+
+  # Images: 30 days (OG placeholder, any future image assets)
+  <FilesMatch "\.(png|jpg|jpeg|gif|webp|avif|svg|ico)$">
+    ExpiresDefault "access plus 30 days"
+  </FilesMatch>
+
+  # HTML: no browser cache (always re-fetch so deploys propagate instantly)
+  <FilesMatch "\.html$">
+    ExpiresDefault "access plus 0 seconds"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Immutable cache for content-hashed assets
+  <FilesMatch "\.(js|css|woff2?|ttf|otf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Medium cache for images
+  <FilesMatch "\.(png|jpg|jpeg|gif|webp|avif|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # No cache for HTML
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# ── END CACHING HEADERS ──────────────────────────────────────────────────────
+
+
+# ── MAINTENANCE / 503 STUB (PHASE 13 — CURRENTLY INERT) ─────────────────────
+# When Phase 13 (maintenance mode) is needed:
+#   1. Create public_html/maintenance.html with the maintenance page HTML.
+#   2. Uncomment the block below.
+#   3. Replace YOUR_IP with the server admin's IP to allow bypass.
+#   4. Re-comment when maintenance is over.
+#
+# IMPORTANT: This block is entirely commented out and has NO effect right now.
+# Do NOT uncomment until Phase 13 is implemented.
+#
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   # Allow owner IP to bypass maintenance page
+#   RewriteCond %{REMOTE_ADDR} !^YOUR_IP$
+#   # Skip if the request IS the maintenance page (prevents redirect loop)
+#   RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+#   RewriteRule ^ /maintenance.html [R=503,L]
+#   ErrorDocument 503 /maintenance.html
+# </IfModule>
+
+# ── END MAINTENANCE STUB ─────────────────────────────────────────────────────
