@@ -23,6 +23,7 @@
 import { getEntry } from 'astro:content';
 import { novel } from '../lib/data';
 import { inlineMarkdown } from '../lib/inlineMarkdown';
+import { EVENTS } from '../lib/analytics';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/Section.astro';
 import Container from '../components/Container.astro';
@@ -147,7 +148,7 @@ const { title, description } = novelPage.data;
       <LettersForm variant="full" />
 
       <div class="novel-world-link">
-        <ArrowLink href={novel.novelWorldUrl}>
+        <ArrowLink href={novel.novelWorldUrl} data-umami-event={EVENTS.NOVEL_SITE_OUTBOUND}>
           Enter the novel world →
         </ArrowLink>
       </div>

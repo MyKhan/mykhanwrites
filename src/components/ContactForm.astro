@@ -1,9 +1,23 @@
 ---
 /**
- * ContactForm.astro — Contact form (structurally complete; submit wiring is Phase 10)
+ * ContactForm.astro — Contact form wired to Web3Forms (Phase 10)
  *
  * Fields: Name · Email · Reason (select, from site.contactReasons) · Message · Send
  * Honeypot: hidden "botcheck" field (aria-hidden, tabindex=-1)
+ *
+ * Web3Forms wiring (Phase 10):
+ *   Native <form method="POST" action="https://api.web3forms.com/submit">
+ *   Hidden access_key field from PUBLIC_WEB3FORMS_ACCESS_KEY env var.
+ *   data-astro-reload on the form: prevents <ClientRouter/> hijacking the cross-origin POST.
+ *   Progressive enhancement: a client script bound on astro:page-load intercepts submit,
+ *   POSTs via fetch (Web3Forms IS CORS-enabled), and shows success/error inline.
+ *   No-JS fallback: native POST → Web3Forms own response page.
+ *   Reset form on success.
+ *
+ * Degraded/pending state (mirrors Kit T6):
+ *   When PUBLIC_WEB3FORMS_ACCESS_KEY is empty/unset at build time →
+ *   submit is disabled + site.pending.web3formsPending note rendered.
+ *   No JS error, no silent dead button.
  *
  * Reason pre-select (Triage T8):
  *   A client script bound on `astro:page-load` reads ?reason from the URL and
@@ -14,13 +28,9 @@
  *
  * Success/error markup:
  *   site.states.contactSuccess / site.states.contactError
- *   Shown/hidden by the Phase-10 submit handler.
+ *   Shown/hidden by the submit handler.
  *
- * Phase 10 TODO:
- *   - Wire the <form action> to Web3Forms endpoint
- *   - Add access_key hidden field (value from env var)
- *   - Implement client fetch + show/hide success/error states
- *   - Add Umami data-umami-event="contact-submit" on the Send button
+ * Umami: data-umami-event="contact-submit" on the Send button.
  *
  * Accessibility:
  *   ≥44px tap targets; amber focus ring; field border warms to amber on focus; labelled inputs.
@@ -28,22 +38,29 @@
 
 import { site } from '../lib/data';
 import { obfuscateEmail, makeMailtoHref } from '../lib/obfuscate';
+import { EVENTS } from '../lib/analytics';
 
 const encodedEmail = obfuscateEmail(site.contactEmail);
 const mailtoHref = makeMailtoHref(site.contactEmail);
+
+// Degraded/pending state: disabled when access key is absent
+const W3F_KEY = import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY;
+const isPending = !W3F_KEY || String(W3F_KEY).trim() === '';
+const formAction = isPending ? '#' : 'https://api.web3forms.com/submit';
 ---
 
-<!-- Phase 10: replace action="#" with Web3Forms endpoint, add access_key hidden field -->
 <form
   class="contact-form"
   method="POST"
-  action="#"
+  action={formAction}
   aria-label="Contact form"
   data-astro-reload
+  data-contact-form
 >
-  <!-- Phase 10: uncomment and populate from env var
-  <input type="hidden" name="access_key" value={import.meta.env.PUBLIC_WEB3FORMS_KEY} />
-  -->
+  {/* Hidden access_key field — Web3Forms public config (not a secret) */}
+  {!isPending && (
+    <input type="hidden" name="access_key" value={W3F_KEY} />
+  )}
 
   <!-- Honeypot — hidden from users + screen readers; bots fill it in -->
   <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">
@@ -68,6 +85,7 @@ const mailtoHref = makeMailtoHref(site.contactEmail);
       autocomplete="name"
       required
       placeholder="Your name"
+      disabled={isPending || undefined}
     />
   </div>
 
@@ -82,6 +100,7 @@ const mailtoHref = makeMailtoHref(site.contactEmail);
       autocomplete="email"
       required
       placeholder="your@email.com"
+      disabled={isPending || undefined}
     />
   </div>
 
@@ -92,6 +111,7 @@ const mailtoHref = makeMailtoHref(site.contactEmail);
       id="cf-reason"
       class="contact-form__select"
       name="reason"
+      disabled={isPending || undefined}
     >
       <option value="">Select a reason…</option>
       {site.contactReasons.map((reason) => (
@@ -110,48 +130,124 @@ const mailtoHref = makeMailtoHref(site.contactEmail);
       rows="6"
       required
       placeholder="Your message…"
+      disabled={isPending || undefined}
     ></textarea>
   </div>
 
   <!-- Submit -->
-  <button type="submit" class="contact-form__submit">
+  <button
+    type="submit"
+    class="contact-form__submit"
+    disabled={isPending || undefined}
+    aria-disabled={isPending ? 'true' : undefined}
+    data-umami-event={EVENTS.CONTACT_SUBMIT}
+  >
     Send
   </button>
 
-  <!-- Success state — Phase 10 submit handler shows this on success -->
+  {isPending && (
+    <p class="contact-form__pending" role="status">
+      {site.pending.web3formsPending}
+    </p>
+  )}
+
+  <!-- Success state — submit handler shows this on success -->
   <div class="contact-form__success" role="status" aria-live="polite" hidden>
     <p>{site.states.contactSuccess}</p>
   </div>
 
-  <!-- Error state — Phase 10 submit handler shows this on failure -->
+  <!-- Error state — submit handler shows this on failure -->
   <div class="contact-form__error" role="alert" aria-live="assertive" hidden>
     <p>
-      {site.states.contactError.prefix}<a href={mailtoHref} set:html={encodedEmail} />{site.states.contactError.suffix}
+      {site.states.contactError.prefix}<a
+        href={mailtoHref}
+        set:html={encodedEmail}
+        data-umami-event={EVENTS.EMAIL_CLICK}
+      />{site.states.contactError.suffix}
     </p>
   </div>
 </form>
 
-<!-- Reason pre-select: bound on astro:page-load (fires on first load + View-Transitions nav).
-     Reads ?reason param, matches case-insensitively against option text, pre-selects if found.
-     Degrades cleanly with no param. -->
+<!--
+  Reason pre-select + Web3Forms progressive enhancement.
+  Both bound on astro:page-load — fires on first load AND after each View-Transitions nav.
+  Clean rebind on each page-load: no document-level listener accumulation.
+-->
 <script>
-  function applyReasonPreselect() {
+  function bindContactForm() {
+    // ── Reason pre-select ──────────────────────────────────────────────────────
     const param = new URLSearchParams(location.search).get('reason');
-    if (!param) return;
-
-    const select = document.getElementById('cf-reason') as HTMLSelectElement | null;
-    if (!select) return;
-
-    const needle = param.toLowerCase();
-    for (const option of Array.from(select.options)) {
-      if (option.text.toLowerCase().includes(needle)) {
-        option.selected = true;
-        break;
+    if (param) {
+      const select = document.getElementById('cf-reason') as HTMLSelectElement | null;
+      if (select) {
+        const needle = param.toLowerCase();
+        for (const option of Array.from(select.options)) {
+          if (option.text.toLowerCase().includes(needle)) {
+            option.selected = true;
+            break;
+          }
+        }
       }
     }
+
+    // ── Web3Forms progressive enhancement ─────────────────────────────────────
+    // Only wire the fetch enhancement when the form has a real action (not '#').
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    if (!form || form.action.endsWith('#')) return;
+
+    // Clone the form to remove any stale submit listener
+    const freshForm = form.cloneNode(true) as HTMLFormElement;
+    form.replaceWith(freshForm);
+
+    // Re-query after clone
+    const activeForm = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    if (!activeForm) return;
+    const activeSuccess = activeForm.querySelector<HTMLElement>('.contact-form__success');
+    const activeError = activeForm.querySelector<HTMLElement>('.contact-form__error');
+
+    activeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const activeSubmit = activeForm.querySelector<HTMLButtonElement>('.contact-form__submit');
+      if (activeSubmit) {
+        activeSubmit.disabled = true;
+        activeSubmit.textContent = 'Sending…';
+      }
+
+      // Hide any previous state
+      if (activeSuccess) activeSuccess.hidden = true;
+      if (activeError) activeError.hidden = true;
+
+      try {
+        const data = new FormData(activeForm);
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: data,
+        });
+
+        const json = (await res.json()) as { success?: boolean };
+
+        if (res.ok && json.success) {
+          // Success: show success message, reset form
+          if (activeSuccess) activeSuccess.hidden = false;
+          activeForm.reset();
+        } else {
+          // API returned a non-success response
+          if (activeError) activeError.hidden = false;
+        }
+      } catch {
+        // Network error or fetch failed
+        if (activeError) activeError.hidden = false;
+      } finally {
+        if (activeSubmit) {
+          activeSubmit.disabled = false;
+          activeSubmit.textContent = 'Send';
+        }
+      }
+    });
   }
 
-  document.addEventListener('astro:page-load', applyReasonPreselect);
+  document.addEventListener('astro:page-load', bindContactForm);
 </script>
 
 <style>
@@ -210,6 +306,14 @@ const mailtoHref = makeMailtoHref(site.contactEmail);
     outline-offset: 2px;
   }
 
+  /* Disabled state (pending) */
+  .contact-form__input:disabled,
+  .contact-form__select:disabled,
+  .contact-form__textarea:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
   .contact-form__select {
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239A8B7A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -252,15 +356,28 @@ const mailtoHref = makeMailtoHref(site.contactEmail);
       transform var(--t) var(--ease-out);
   }
 
-  .contact-form__submit:hover {
+  .contact-form__submit:hover:not(:disabled) {
     background: var(--color-amber-bright, #d4a843);
     border-color: var(--color-amber-bright, #d4a843);
     transform: translateY(-1px);
   }
 
+  .contact-form__submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
   .contact-form__submit:focus-visible {
     outline: 2px solid var(--color-amber);
     outline-offset: 3px;
+  }
+
+  /* Pending note */
+  .contact-form__pending {
+    font-size: 0.84rem;
+    color: var(--color-muted);
+    font-style: italic;
+    margin-block: 0 0.5rem;
   }
 
   /* Success / error states */

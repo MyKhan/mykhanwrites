@@ -31,6 +31,7 @@
  */
 
 import { site, novel } from '../lib/data';
+import { EVENTS } from '../lib/analytics';
 
 interface Props {
   variant?: 'full' | 'compact';
@@ -90,6 +91,7 @@ const formAction = isPending
         class="letters-submit"
         disabled={isPending || undefined}
         aria-disabled={isPending ? 'true' : undefined}
+        data-umami-event={EVENTS.NEWSLETTER_SUBMIT}
       >
         {variant === 'full' ? site.letters.button : site.footer.compactSignup.button}
       </button>

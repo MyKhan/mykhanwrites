@@ -95,14 +95,32 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
     <!-- Umami analytics — cookieless, no consent banner required.
          Rendered ONLY when PUBLIC_UMAMI_ID is set in the environment.
          Absent/unset → script tag is omitted entirely (no console error).
-         Phase 10 finalizes: SPA pageview re-tracking + data-umami-event attributes. -->
+         data-auto-track="false" disables Umami's built-in auto-pageview on load
+         AND its pushState intercepts — so the astro:page-load handler below
+         is the SINGLE source of pageviews (no double-count with <ClientRouter/>). -->
     {umamiId && (
       <script
         is:inline
         async
         src="https://cloud.umami.is/script.js"
         data-website-id={umamiId}
+        data-auto-track="false"
       />
+    )}
+
+    <!-- SPA pageview tracking for Umami + Astro <ClientRouter />.
+         Fires on every astro:page-load (initial load + each View-Transitions nav).
+         Umami's hosted script tracks history.pushState automatically, but astro:page-load
+         fires AFTER the new page is fully inserted, making it the reliable hook.
+         Guards against Umami not yet being loaded on very fast first loads. -->
+    {umamiId && (
+      <script is:inline>
+        document.addEventListener('astro:page-load', function () {
+          if (typeof window.umami !== 'undefined' && typeof window.umami.track === 'function') {
+            window.umami.track();
+          }
+        });
+      </script>
     )}
   </body>
 </html>

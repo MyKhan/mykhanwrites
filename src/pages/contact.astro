@@ -16,6 +16,7 @@
 import { getEntry } from 'astro:content';
 import { site } from '../lib/data';
 import { obfuscateEmail, makeMailtoHref } from '../lib/obfuscate';
+import { EVENTS } from '../lib/analytics';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/Section.astro';
 import Container from '../components/Container.astro';
@@ -61,11 +62,12 @@ const afterMtm = mtmParts[1] ?? '';
     <div class="contact-layout">
       <div class="contact-intro">
         <p class="contact-intro__text">
-          {beforeEmail}<a href={mailtoHref} set:html={encodedEmail} class="contact-intro__email" />{beforeMtm}<a
+          {beforeEmail}<a href={mailtoHref} set:html={encodedEmail} class="contact-intro__email" data-umami-event={EVENTS.EMAIL_CLICK} />{beforeMtm}<a
             href="https://mantalksmedia.com"
             class="contact-intro__link"
             target="_blank"
             rel="noopener noreferrer"
+            data-umami-event={EVENTS.MANTALKSMEDIA_OUTBOUND}
           >ManTalksMedia</a>{afterMtm}
         </p>
       </div>

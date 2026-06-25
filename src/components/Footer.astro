@@ -25,6 +25,7 @@ import { site } from '../lib/data';
 import Crane from './Crane.astro';
 import { obfuscateEmail, makeMailtoHref } from '../lib/obfuscate';
 import LettersForm from './LettersForm.astro';
+import { EVENTS } from '../lib/analytics';
 
 interface Props {
   showSignup?: boolean;
@@ -95,6 +96,7 @@ const encodedHref = makeMailtoHref(email);
                   class="footer-link"
                   target={item.href.startsWith('http') ? '_blank' : undefined}
                   rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  data-umami-event={item.href.includes('onlywhenitrains') ? EVENTS.NOVEL_SITE_OUTBOUND : undefined}
                 >
                   {item.label}
                 </a>
@@ -114,6 +116,13 @@ const encodedHref = makeMailtoHref(email);
                   class="footer-link"
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-umami-event={
+                    item.href.includes('comparemydrafts')
+                      ? EVENTS.WRITING_TOOL_OUTBOUND
+                      : item.href.includes('mantalksmedia')
+                        ? EVENTS.MANTALKSMEDIA_OUTBOUND
+                        : undefined
+                  }
                 >
                   {item.label}
                 </a>
@@ -159,6 +168,7 @@ const encodedHref = makeMailtoHref(email);
                 href={encodedHref}
                 class="footer-link"
                 set:html={encodedEmail}
+                data-umami-event={EVENTS.EMAIL_CLICK}
               />
             </li>
           </ul>

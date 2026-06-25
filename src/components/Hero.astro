@@ -22,6 +22,7 @@ import Eyebrow from './Eyebrow.astro';
 import PrimaryButton from './primitives/PrimaryButton.astro';
 import ArrowLink from './primitives/ArrowLink.astro';
 import QuietLink from './primitives/QuietLink.astro';
+import { EVENTS } from '../lib/analytics';
 ---
 
 <section class="hero" aria-label="Site hero">
@@ -55,7 +56,7 @@ import QuietLink from './primitives/QuietLink.astro';
         data-umami-event="hero-read-first-pages"
       >{site.cta.heroPrimary}</PrimaryButton>
 
-      <ArrowLink href={site.cta.novelWorldUrl}>
+      <ArrowLink href={site.cta.novelWorldUrl} data-umami-event={EVENTS.NOVEL_SITE_OUTBOUND}>
         {site.cta.novelWorld}
       </ArrowLink>
 

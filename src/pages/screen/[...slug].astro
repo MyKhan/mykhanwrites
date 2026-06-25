@@ -39,6 +39,7 @@ import { screen } from '../../lib/data';
 import { SCREEN_PUBLISHED } from '../../lib/flags';
 import { obfuscateEmail, makeMailtoHref } from '../../lib/obfuscate';
 import { inlineMarkdown } from '../../lib/inlineMarkdown';
+import { EVENTS } from '../../lib/analytics';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Section from '../../components/Section.astro';
 import Container from '../../components/Container.astro';
@@ -266,6 +267,7 @@ function isPending(value: string): boolean {
             set:html={encodedEmail}
             class="screen-contact-email"
             aria-label="Email hello at mykhanwrites dot com"
+            data-umami-event={EVENTS.EMAIL_CLICK}
           />
         </p>
       </div>

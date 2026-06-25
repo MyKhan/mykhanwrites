@@ -92,6 +92,26 @@ const { Content } = await render(aboutEntry);
 
 </BaseLayout>
 
+<!--
+  Tag the Compare My Drafts link rendered from about.md content.
+  Bound on astro:page-load so it fires on first load AND after View-Transitions nav.
+  Finds any anchor pointing to comparemydrafts.com and adds the Umami event attribute.
+-->
+<script>
+  import { EVENTS } from '../lib/analytics';
+
+  function tagAboutLinks() {
+    const prose = document.getElementById('about-bio');
+    if (!prose) return;
+    const links = prose.querySelectorAll<HTMLAnchorElement>('a[href*="comparemydrafts"]');
+    for (const link of Array.from(links)) {
+      link.setAttribute('data-umami-event', EVENTS.WRITING_TOOL_OUTBOUND);
+    }
+  }
+
+  document.addEventListener('astro:page-load', tagAboutLinks);
+</script>
+
 <style>
   /* ── Hero ──────────────────────────────────────────────────────── */
   .about-hero {
