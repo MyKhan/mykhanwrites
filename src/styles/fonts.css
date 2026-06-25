@@ -1,0 +1,43 @@
+/*
+ * fonts.css — Self-hosted font faces via Fontsource (NO Google Fonts CDN)
+ *
+ * Fraunces Variable: roman (wght) + italic (wght-italic) — BOTH required.
+ * Roman-only produces fake synthesized italics; italic Fraunces is used for
+ * epigraphs/novel cues and must be the real optical variant.
+ *
+ * Inter (non-variable): weights 300 / 400 / 500 only (body / default / labels).
+ *
+ * font-display: swap — confirmed in all Fontsource @font-face rules below.
+ * font-optical-sizing: auto — set on body in global.css (Fraunces has an opsz axis).
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PHASE 4 PRELOAD HANDOFF
+ * ─────────────────────────────────────────────────────────────────────────────
+ * The critical Fraunces roman latin WOFF2 is resolved via Vite ?url in
+ * src/lib/fonts.ts (so the hashed asset path is captured at build time).
+ *
+ * Phase 4's Head.astro must emit exactly ONE preload link for this file:
+ *
+ *   import { frauncesRomanLatinUrl } from '../lib/fonts';
+ *   ...
+ *   <link rel="preload" as="font" type="font/woff2" crossorigin href={frauncesRomanLatinUrl} />
+ *
+ * Preload the latin subset only (covers the vast majority of users);
+ * do NOT preload the italic variant (it's not render-blocking on initial paint).
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* Fraunces Variable — roman (upright) */
+@import '@fontsource-variable/fraunces/wght.css';
+
+/* Fraunces Variable — italic (real optical italic; NOT synthesized) */
+@import '@fontsource-variable/fraunces/wght-italic.css';
+
+/* Inter — weight 300 (body text) */
+@import '@fontsource/inter/300.css';
+
+/* Inter — weight 400 (default / UI) */
+@import '@fontsource/inter/400.css';
+
+/* Inter — weight 500 (labels / eyebrows) */
+@import '@fontsource/inter/500.css';
