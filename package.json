@@ -8,7 +8,12 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify:contrast": "node scripts/contrast-audit.mjs",
+    "verify:links": "linkinator dist/ --recurse --skip \"[&]\" --skip \"https://.*\"",
+    "verify:lh": "lhci autorun",
+    "verify:a11y": "axe http://localhost:4321 http://localhost:4321/novel/ http://localhost:4321/about/ http://localhost:4321/writing/ http://localhost:4321/contact/ http://localhost:4321/letters/",
+    "verify:a11y:screen": "echo 'Run: SCREEN_PUBLISHED=true npm run build && npm run preview, then: axe http://localhost:4321/screen/'"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
@@ -20,6 +25,9 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@axe-core/cli": "^4.12.1",
+    "@lhci/cli": "^0.15.1",
+    "linkinator": "^7.6.1",
     "prettier": "^3.4.2",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.7.2",
