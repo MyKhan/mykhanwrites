@@ -1,0 +1,28 @@
+---
+/**
+ * Grain.astro — Full-screen film-grain overlay
+ *
+ * Ports the styleguide's `.grain` exactly:
+ *   position:fixed; inset:0; z-index:60; pointer-events:none;
+ *   opacity:.06; mix-blend-mode:overlay;
+ *   background-image: SVG feTurbulence data-URI (baseFrequency:0.9, numOctaves:2, stitchTiles:stitch)
+ *
+ * The grain is a rasterized SVG-feTurbulence data-URI used as a background-image.
+ * It rasterizes once at paint time — it is NOT a live SVG filter applied to content,
+ * so it does not trigger continuous repaints.
+ *
+ * PERF NOTE (Phase 12): Measure mobile INP after shipping. If full-screen-scroll
+ * paint cost is high on low-end Android, swap this data-URI for a base64-encoded
+ * PNG raster (~4 KB, tiled) to avoid the browser re-rasterizing the SVG filter
+ * on every paint. The visual result is identical; the swap is purely a perf win.
+ *
+ * aria-hidden: true — purely decorative, invisible to screen readers.
+ * pointer-events: none — never intercepts clicks/touches.
+ */
+---
+
+<div
+  aria-hidden="true"
+  style="position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.06;mix-blend-mode:overlay;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;)"
+>
+</div>

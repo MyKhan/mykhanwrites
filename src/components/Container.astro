@@ -1,0 +1,44 @@
+---
+/**
+ * Container.astro — Max-width frame with fluid gutters
+ *
+ * Default: max-width var(--frame) = 1280px, centered, fluid gutters.
+ * Measure variant: adds an inner cap at var(--measure) = 34em for text columns
+ * (the "calm margins" rule: frame wide, reading column capped).
+ *
+ * Binding resolution (T23/R1): uses --frame (1280) and --measure (34em).
+ * IGNORE the mockups' .wrap{max-width:1080px} — that was preview-only.
+ *
+ * Props:
+ *   measure — boolean; when true, caps inner prose at --measure (34em)
+ *   class   — additional CSS classes
+ *   as      — HTML element tag (default: 'div')
+ *
+ * Usage:
+ *   <Container>…full-width section content…</Container>
+ *   <Container measure>…reading column content…</Container>
+ */
+
+const {
+  measure = false,
+  class: className = '',
+  as: Tag = 'div',
+}: {
+  measure?: boolean;
+  class?: string;
+  as?: keyof HTMLElementTagNameMap;
+} = Astro.props;
+---
+
+<Tag
+  class={className}
+  style={`max-width:var(--frame);margin-inline:auto;padding-inline:clamp(20px,5vw,40px)${measure ? ';--inner-measure:var(--measure)' : ''}`}
+>
+  {measure ? (
+    <div style="max-width:var(--measure)">
+      <slot />
+    </div>
+  ) : (
+    <slot />
+  )}
+</Tag>

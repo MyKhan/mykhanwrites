@@ -1,0 +1,33 @@
+---
+/**
+ * Eyebrow.astro — Section/hero kicker label
+ *
+ * Inter 500, .74rem, letter-spacing:.22em, text-transform:uppercase.
+ *
+ * Tone variants (T7 — contrast verified):
+ *   'amber'   → var(--color-amber)   #C9A24B — 7.84:1 on ink — AA pass (default; section kickers)
+ *   'eyebrow' → var(--color-eyebrow) #9A8B7A — 5.68:1 on ink — AA pass (hero eyebrow in brown)
+ *
+ * NEVER use --color-brown (#8A7358 ≈ 4.18:1 on ink) for eyebrow text — it fails AA.
+ *
+ * Usage:
+ *   <Eyebrow>01 — Chapter</Eyebrow>
+ *   <Eyebrow tone="eyebrow">Meher Yar Khan · Writer</Eyebrow>
+ */
+
+interface Props {
+  tone?: 'amber' | 'eyebrow';
+  class?: string;
+}
+
+const { tone = 'amber', class: className = '' } = Astro.props;
+
+const colorVar = tone === 'eyebrow' ? 'var(--color-eyebrow)' : 'var(--color-amber)';
+---
+
+<p
+  class={className}
+  style={`font-family:var(--font-sans);font-size:.74rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:${colorVar}`}
+>
+  <slot />
+</p>

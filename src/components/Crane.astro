@@ -1,0 +1,56 @@
+---
+/**
+ * Crane.astro — Origami crane line mark
+ *
+ * A clean, recognisable origami crane in minimal strokes: body, raised wing,
+ * head/beak, and tail — suggested folded paper, not literal illustration.
+ * Replaces the unclear styleguide path (DESIGN.md §5 note: "pending a cleaner
+ * origami redesign for favicon/footer").
+ *
+ * [PENDING redesign sign-off] — pending-asset register #10.
+ * This is a real improvement over the styleguide placeholder but should be
+ * reviewed and signed off before Phase 5/6 ship.
+ *
+ * Props:
+ *   size  — numeric pixel size, controls width & height (default: 46)
+ *   class — additional CSS classes for use-site colour / spacing
+ *
+ * Usage:
+ *   <Crane />                    → 46×46, inherits currentColor
+ *   <Crane size={32} />          → 32×32
+ *   <Crane class="text-amber" /> → amber stroke
+ *
+ * Favicon and Footer use only — never the hero.
+ */
+
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 46, class: className = '' } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 100 100"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="3.2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  class={className}
+>
+  <!-- Origami crane — body (main triangular hull) -->
+  <path d="M50 72 L22 55 L50 38 L78 55 Z" />
+  <!-- Raised left wing (upper-left angled plane) -->
+  <path d="M50 38 L18 26 L22 55" />
+  <!-- Right wing extension (sweeping right) -->
+  <path d="M50 38 L82 26 L78 55" />
+  <!-- Head and beak (small pointed peak from right-body junction) -->
+  <path d="M78 55 L88 43 L92 46" />
+  <!-- Tail (lower-left point) -->
+  <path d="M22 55 L10 66" />
+</svg>

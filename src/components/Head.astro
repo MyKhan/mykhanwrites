@@ -1,0 +1,52 @@
+---
+/**
+ * Head.astro — <head> contents for every page
+ *
+ * Emits: charset, viewport, title, meta description, font preload <link>,
+ * favicon <link>, and a <slot/> for per-page extra head tags.
+ *
+ * Font preload (Phase 2 handoff, T13):
+ *   Imports frauncesRomanLatinUrl from ../lib/fonts and emits exactly one
+ *   <link rel="preload" as="font" type="font/woff2" crossorigin href={...}>
+ *   for the critical Fraunces roman latin variable font.
+ *   Only the roman (upright) face — do NOT preload italic (not render-blocking).
+ *
+ * NOTE — items deferred to Phase 11 (seo.ts / jsonld.ts):
+ *   - Canonical URL <link>
+ *   - Open Graph meta tags (og:title, og:description, og:image)
+ *   - Twitter card meta tags
+ *   - Sitemap <link>
+ *   - JSON-LD structured data
+ *   Do NOT build those here.
+ *
+ * Props:
+ *   title       — <title> text (required)
+ *   description — meta description (required)
+ *   ogImage     — reserved for Phase 11 OG image; accepted but not yet emitted
+ */
+
+import { frauncesRomanLatinUrl } from '../lib/fonts';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={description} />
+
+<!-- Critical font preload: Fraunces roman latin variable subset (Phase 2 handoff T13) -->
+<link rel="preload" as="font" type="font/woff2" crossorigin href={frauncesRomanLatinUrl} />
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<!-- Per-page extra head tags (canonical, OG, JSON-LD added in Phase 11) -->
+<slot />

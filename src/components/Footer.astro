@@ -1,0 +1,269 @@
+---
+/**
+ * Footer.astro — Site-wide footer
+ *
+ * DESIGN.md §5 + UI Kit §6 + copy §1.7
+ *
+ * Structure:
+ *   1. Compact signup slot — RESERVED for Phase 6/10 (LettersForm compact variant).
+ *      Suppressed via showSignup prop. Do NOT build the form here.
+ *   2. Main footer grid: identity lockup + four link columns + Crane mark
+ *   3. Two-line identity (T21): footer.identityLine1 / footer.identityLine2 on separate lines
+ *   4. Columns from site.footer.columns: Read, Elsewhere, Follow, Contact
+ *   5. Follow: Instagram linked; TikTok + X are null — rendered as muted non-link text
+ *   6. Contact: email obfuscated via obfuscate.ts (no plaintext mailto in built HTML)
+ *
+ * Background: var(--color-ink-deep) = #100D0B
+ * Border: border-top: 1px solid var(--line)
+ *
+ * Props:
+ *   showSignup — boolean (default true); reserved for Phase 6/10 compact signup slot.
+ *                Currently has no visible effect — form not yet built.
+ */
+
+import { site } from '../lib/data';
+import Crane from './Crane.astro';
+import { obfuscateEmail, makeMailtoHref } from '../lib/obfuscate';
+
+interface Props {
+  showSignup?: boolean;
+}
+
+const { showSignup = true } = Astro.props;
+
+const columns = site.footer.columns;
+const email = site.contactEmail;
+
+// Pre-encode email so no plaintext address appears in the built HTML
+const encodedEmail = obfuscateEmail(email);
+const encodedHref = makeMailtoHref(email);
+
+// Note: site.socials.tiktok and site.socials.x are null per data.ts
+// TikTok / X are reserved/unlinked — rendered as muted non-link text, no dead <a> tags.
+---
+
+<footer
+  style="background:var(--color-ink-deep);border-top:1px solid var(--line)"
+>
+  <!-- ── RESERVED SLOT: Phase 6/10 compact signup ───────────────────────────
+       LettersForm (compact variant) goes here once built.
+       Suppressed on /screen route via showSignup prop passed from BaseLayout.
+       To activate: replace this comment block with <LettersForm compact />
+       and gate it with {showSignup && <LettersForm compact />}.
+       ────────────────────────────────────────────────────────────────────── -->
+  {showSignup && false && (
+    <slot name="footer-signup" />
+  )}
+
+  <!-- Main footer content -->
+  <div
+    style="max-width:var(--frame);margin-inline:auto;padding-inline:clamp(20px,5vw,40px);padding-block:clamp(48px,8vh,80px)"
+  >
+    <div class="footer-grid">
+
+      <!-- Identity lockup + Crane -->
+      <div class="footer-identity">
+        <Crane size={40} class="footer-crane" />
+        <!-- Two-line identity (T21) — rendered as two lines, not a run-on -->
+        <p class="identity-line">{site.footer.identityLine1}</p>
+        <p class="identity-line identity-line--dim">{site.footer.identityLine2}</p>
+      </div>
+
+      <!-- Column: Read -->
+      <div class="footer-col">
+        <p class="col-heading">Read</p>
+        <ul role="list" class="col-list">
+          {columns.read.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="footer-link"
+                target={item.href.startsWith('http') ? '_blank' : undefined}
+                rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Column: Elsewhere -->
+      <div class="footer-col">
+        <p class="col-heading">Elsewhere</p>
+        <ul role="list" class="col-list">
+          {columns.elsewhere.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="footer-link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Column: Follow -->
+      <div class="footer-col">
+        <p class="col-heading">Follow</p>
+        <ul role="list" class="col-list">
+          {columns.follow.map((social) => (
+            <li>
+              <a
+                href={social.href}
+                class="footer-link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {social.label} <span class="handle">{social.handle}</span>
+              </a>
+            </li>
+          ))}
+          {/* TikTok — null in site.socials; reserved, not yet linked.
+              Do NOT emit a dead <a> tag. */}
+          {site.socials.tiktok === null && (
+            <li><span class="footer-reserved">TikTok — coming soon</span></li>
+          )}
+          {/* X / Twitter — null in site.socials; reserved, not yet linked. */}
+          {site.socials.x === null && (
+            <li><span class="footer-reserved">X — coming soon</span></li>
+          )}
+        </ul>
+      </div>
+
+      <!-- Column: Contact -->
+      <div class="footer-col">
+        <p class="col-heading">Contact</p>
+        <ul role="list" class="col-list">
+          <li>
+            <!--
+              Email obfuscation: set:html renders the entity-encoded string in the browser.
+              No plaintext email address appears in the built HTML source.
+              The href is also entity-encoded. Real users see/click a normal mailto link.
+              Screen readers read the decoded text correctly.
+            -->
+            <a
+              href={encodedHref}
+              class="footer-link"
+              set:html={encodedEmail}
+            />
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  @media (min-width: 640px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 820px) {
+    .footer-grid {
+      grid-template-columns: 1.4fr repeat(4, 1fr);
+      gap: 32px;
+    }
+  }
+
+  .footer-identity {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer-crane {
+    color: var(--color-amber);
+    margin-bottom: 4px;
+  }
+
+  .identity-line {
+    font-size: 0.82rem;
+    color: var(--color-parchment-dim);
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
+
+  .identity-line--dim {
+    color: var(--color-muted);
+  }
+
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .col-heading {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-amber);
+    font-weight: 500;
+    font-family: var(--font-sans);
+  }
+
+  .col-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Underline-draw footer links — consistent with header nav */
+  .footer-link {
+    position: relative;
+    font-size: 0.88rem;
+    color: var(--color-parchment-dim);
+    text-decoration: none;
+    transition: color var(--t) var(--ease-out);
+  }
+
+  .footer-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: var(--color-amber);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t) var(--ease-out);
+  }
+
+  .footer-link:hover {
+    color: var(--color-parchment);
+  }
+
+  .footer-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  .handle {
+    color: var(--color-muted);
+    font-size: 0.8rem;
+  }
+
+  /* TikTok / X reserved — muted non-link text (no dead <a> tags) */
+  .footer-reserved {
+    font-size: 0.82rem;
+    color: var(--color-muted);
+    font-style: italic;
+  }
+</style>

@@ -1,0 +1,96 @@
+---
+/**
+ * BaseLayout.astro — Single site-wide layout
+ *
+ * Every route inherits this layout. Structure:
+ *   <html lang="en">
+ *     <head>  ← Head.astro (charset, viewport, title, description, font preload, favicon)
+ *             ← <ClientRouter /> (View Transitions / SPA navigation)
+ *             ← <slot name="head" /> (per-page extra head tags)
+ *     <body>
+ *       <Header />   ← sticky topbar, wordmark, nav
+ *       <main>
+ *         <slot />   ← page body content
+ *       </main>
+ *       <Footer showSignup={showFooterSignup} />
+ *       <Grain />    ← fixed film-grain overlay (z-index:60)
+ *       Umami script ← async analytics, ONLY when PUBLIC_UMAMI_ID is set (cookieless)
+ *
+ * <ClientRouter /> lifecycle note (V4):
+ *   Inline scripts do NOT re-run on SPA navigation. Any client-side listener
+ *   (e.g. Header's mobile-nav toggle) MUST be bound on the `astro:page-load`
+ *   event, which fires on first load AND after each View-Transitions navigation.
+ *   See Header.astro for the implementation.
+ *
+ * Umami (Phase 10 note):
+ *   Umami is cookieless — no banner required.
+ *   SPA pageview re-tracking and data-umami-event attributes are finalized in Phase 10.
+ *   Currently: script tag is injected when PUBLIC_UMAMI_ID is set; omitted otherwise.
+ *   No console error or build error when the env var is unset.
+ *
+ * Props:
+ *   title            — passed to Head (required)
+ *   description      — passed to Head (required)
+ *   ogImage?         — passed to Head (reserved for Phase 11)
+ *   showFooterSignup — passed to Footer; reserved for Phase 6/10 compact signup (default: true)
+ */
+
+import { ClientRouter } from 'astro:transitions';
+import Head from '../components/Head.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Grain from '../components/Grain.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  showFooterSignup?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  showFooterSignup = true,
+} = Astro.props;
+
+// Umami analytics: render only when env var is present (cookieless, no banner needed)
+const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
+---
+
+<html lang="en">
+  <head>
+    <Head title={title} description={description} {...(ogImage ? { ogImage } : {})} />
+    <!-- View Transitions / SPA navigation (astro:transitions) -->
+    <ClientRouter />
+    <!-- Per-page extra head tags (canonical, OG, JSON-LD — Phase 11) -->
+    <slot name="head" />
+  </head>
+
+  <body>
+    <Header />
+
+    <main>
+      <slot />
+    </main>
+
+    <Footer showSignup={showFooterSignup} />
+
+    <!-- Film-grain overlay (fixed, z-index:60, pointer-events:none) -->
+    <Grain />
+
+    <!-- Umami analytics — cookieless, no consent banner required.
+         Rendered ONLY when PUBLIC_UMAMI_ID is set in the environment.
+         Absent/unset → script tag is omitted entirely (no console error).
+         Phase 10 finalizes: SPA pageview re-tracking + data-umami-event attributes. -->
+    {umamiId && (
+      <script
+        is:inline
+        async
+        src="https://cloud.umami.is/script.js"
+        data-website-id={umamiId}
+      />
+    )}
+  </body>
+</html>

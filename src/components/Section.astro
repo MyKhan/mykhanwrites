@@ -1,0 +1,53 @@
+---
+/**
+ * Section.astro — Page section scaffold
+ *
+ * A <section> with generous vertical rhythm and a top hairline separator.
+ * Wraps content in <Container> by default.
+ *
+ * CSS (ports styleguide .sec):
+ *   padding-block: clamp(72px, 10vh, 132px)
+ *   border-top: 1px solid var(--line)
+ *
+ * Props:
+ *   band      — boolean; when true, sets background to var(--color-ink-2) for alt-surface sections
+ *   noContainer — boolean; when true, skips the inner Container wrapper (for full-bleed sections)
+ *   id        — optional HTML id for anchor links
+ *   class     — additional CSS classes
+ *
+ * Usage:
+ *   <Section>…standard content…</Section>
+ *   <Section band>…alternate background…</Section>
+ *   <Section noContainer>…full-bleed content…</Section>
+ */
+
+import Container from './Container.astro';
+
+interface Props {
+  band?: boolean;
+  noContainer?: boolean;
+  id?: string;
+  class?: string;
+}
+
+const {
+  band = false,
+  noContainer = false,
+  id,
+  class: className = '',
+} = Astro.props;
+---
+
+<section
+  id={id}
+  class={className}
+  style={`padding-block:clamp(72px,10vh,132px);border-top:1px solid var(--line)${band ? ';background:var(--color-ink-2)' : ''}`}
+>
+  {noContainer ? (
+    <slot />
+  ) : (
+    <Container>
+      <slot />
+    </Container>
+  )}
+</section>

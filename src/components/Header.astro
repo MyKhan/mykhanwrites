@@ -1,0 +1,247 @@
+---
+/**
+ * Header.astro — Site-wide sticky topbar
+ *
+ * Ports styleguide .topbar exactly:
+ *   position:sticky; top:0; z-index:40;
+ *   background:rgba(20,17,15,.8); backdrop-filter:blur(10px);
+ *   border-bottom:1px solid var(--line);
+ *   height:64px inner row;
+ *
+ * Features:
+ *   - Wordmark (site.wordmark) in Fraunces, 1.05rem, letter-spacing:.04em → links to /
+ *   - Nav from site.nav: uppercase tracked links with underline-draw hover
+ *     (ports .u-link::after scaleX 0→1, 280ms, var(--ease-out))
+ *   - aria-current="page" on the active route (Astro.url.pathname match)
+ *   - Mobile (<640px): accessible hamburger toggle — button with aria-expanded /
+ *     aria-controls, ≥44px tap target, amber focus ring
+ *   - Mobile nav JS bound on astro:page-load (View Transitions lifecycle, V4)
+ *     so it re-initialises after every SPA navigation
+ *   - Reduced-motion: transitions collapse to instant via global.css media query
+ */
+
+import { site } from '../lib/data';
+
+const pathname = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  if (href === '/') return pathname === '/';
+  return pathname.startsWith(href);
+}
+---
+
+<header
+  style="position:sticky;top:0;z-index:40;background:rgba(20,17,15,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)"
+>
+  <div
+    style="max-width:var(--frame);margin-inline:auto;padding-inline:clamp(20px,5vw,40px);display:flex;justify-content:space-between;align-items:center;height:64px"
+  >
+    <!-- Wordmark -->
+    <a
+      href="/"
+      style="font-family:var(--font-serif);font-size:1.05rem;letter-spacing:.04em;color:var(--color-parchment);text-decoration:none"
+      aria-label={`${site.wordmark} — home`}
+    >
+      {site.wordmark}
+    </a>
+
+    <!-- Desktop nav -->
+    <nav aria-label="Primary navigation">
+      <ul
+        id="primary-nav"
+        role="list"
+        style="display:flex;gap:clamp(20px,3vw,36px);list-style:none;margin:0;padding:0"
+      >
+        {
+          site.nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class="nav-link"
+                style="position:relative;font-size:.82rem;letter-spacing:.13em;text-transform:uppercase;color:var(--color-parchment);text-decoration:none;padding-block:4px"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <!-- Mobile menu toggle (visible below sm breakpoint) -->
+    <button
+      id="mobile-nav-toggle"
+      aria-controls="mobile-nav"
+      aria-expanded="false"
+      aria-label="Open navigation menu"
+      style="display:none;background:none;border:none;color:var(--color-parchment);cursor:pointer;padding:10px;min-width:44px;min-height:44px;align-items:center;justify-content:center"
+    >
+      <!-- Hamburger icon -->
+      <svg
+        width="22"
+        height="16"
+        viewBox="0 0 22 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <line x1="0" y1="2" x2="22" y2="2" />
+        <line x1="0" y1="8" x2="22" y2="8" />
+        <line x1="0" y1="14" x2="22" y2="14" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile nav drawer -->
+  <div
+    id="mobile-nav"
+    aria-hidden="true"
+    style="display:none;border-top:1px solid var(--line);background:rgba(20,17,15,.96);backdrop-filter:blur(10px)"
+  >
+    <nav aria-label="Mobile navigation">
+      <ul
+        role="list"
+        style="max-width:var(--frame);margin-inline:auto;padding:16px clamp(20px,5vw,40px) 24px;list-style:none;display:flex;flex-direction:column;gap:0"
+      >
+        {
+          site.nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                style="display:block;padding:14px 0;font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;color:var(--color-parchment);text-decoration:none;border-bottom:1px solid var(--line)"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* Underline-draw hover — ports .u-link::after (scaleX 0→1, 280ms, ease-out) */
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    height: 1px;
+    width: 100%;
+    background: var(--color-amber);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t) var(--ease-out);
+  }
+
+  .nav-link:hover {
+    color: var(--color-amber);
+  }
+
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Active route — persistent amber underline */
+  .nav-link[aria-current='page'] {
+    color: var(--color-amber);
+  }
+
+  .nav-link[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  /* Mobile: hide desktop nav, show toggle below sm breakpoint */
+  @media (max-width: 639px) {
+    nav[aria-label='Primary navigation'] {
+      display: none;
+    }
+
+    #mobile-nav-toggle {
+      display: flex !important;
+    }
+  }
+
+  /* Reduced-motion: underline appears instantly (global.css collapses transitions) */
+</style>
+
+<script>
+  /**
+   * Mobile nav toggle — bound on astro:page-load (View Transitions lifecycle).
+   *
+   * astro:page-load fires on BOTH initial load AND after every View Transitions
+   * navigation. Binding here (not in a bare inline script) ensures the toggle
+   * re-initialises after each SPA navigation — critical with <ClientRouter />.
+   *
+   * Behaviour:
+   *   - Toggles aria-expanded on the button and aria-hidden on the drawer
+   *   - Updates aria-label for screen readers
+   *   - Closes nav on Escape key (single document-level handler, registered once)
+   *   - Auto-closes on any nav-link click (navigation is imminent)
+   *
+   * Keydown handler strategy: registered ONCE per session (guarded by a flag).
+   * The handler queries the live DOM at event time so it always operates on the
+   * CURRENT page's toggle — never a detached node from a previous navigation.
+   */
+
+  // Guard: the document keydown listener is installed exactly once per session.
+  let keydownInstalled = false;
+
+  function handleEscape(e: KeyboardEvent) {
+    if (e.key !== 'Escape') return;
+    // Query live DOM at event time — never a stale/detached reference.
+    const liveToggle = document.getElementById('mobile-nav-toggle');
+    const liveNav = document.getElementById('mobile-nav');
+    if (!liveToggle || !liveNav) return;
+    if (liveToggle.getAttribute('aria-expanded') === 'true') {
+      liveToggle.setAttribute('aria-expanded', 'false');
+      liveToggle.setAttribute('aria-label', 'Open navigation menu');
+      liveNav.setAttribute('aria-hidden', 'true');
+      liveNav.style.display = 'none';
+      liveToggle.focus();
+    }
+  }
+
+  function initMobileNav() {
+    const toggle = document.getElementById('mobile-nav-toggle');
+    const nav = document.getElementById('mobile-nav');
+
+    if (!toggle || !nav) return;
+
+    function setOpen(open: boolean) {
+      toggle!.setAttribute('aria-expanded', String(open));
+      toggle!.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+      nav!.setAttribute('aria-hidden', String(!open));
+      nav!.style.display = open ? 'block' : 'none';
+    }
+
+    // Remove any stale listeners from a previous page load by cloning
+    const freshToggle = toggle.cloneNode(true) as HTMLElement;
+    toggle.parentNode?.replaceChild(freshToggle, toggle);
+
+    freshToggle.addEventListener('click', () => {
+      const isOpen = freshToggle.getAttribute('aria-expanded') === 'true';
+      setOpen(!isOpen);
+    });
+
+    // Install the document keydown handler exactly once per session.
+    // handleEscape queries the live DOM, so it is safe across navigations.
+    if (!keydownInstalled) {
+      document.addEventListener('keydown', handleEscape);
+      keydownInstalled = true;
+    }
+
+    // Auto-close when a mobile nav link is tapped
+    nav.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => setOpen(false));
+    });
+  }
+
+  // astro:page-load fires on first render AND after every View Transitions navigation
+  document.addEventListener('astro:page-load', initMobileNav);
+</script>
