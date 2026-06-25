@@ -1,3 +1,216 @@
 @import "tailwindcss";
 
-/* Phase 1 will add the @theme {} token block below this import. */
+/* ==========================================================================
+   DESIGN TOKENS — Tailwind v4 CSS-first @theme block
+   Values are authoritative; do NOT edit without re-verifying all contrast
+   ratios and referencing the phase-1-brief.md.
+   ========================================================================== */
+
+@theme {
+  /* -----------------------------------------------------------------------
+     COLORS
+     Namespace: --color-* → generates bg-*, text-*, border-*, fill-*, etc.
+     ----------------------------------------------------------------------- */
+
+  /* Ink (dark backgrounds / body text on light) */
+  --color-ink:        #14110F;
+  --color-ink-2:      #1B1714;
+  --color-ink-3:      #221D18;
+  --color-ink-4:      #2A241E;
+  --color-ink-deep:   #100D0B;
+
+  /* Parchment (light text on dark) */
+  --color-parchment:     #ECE3D2;
+  --color-parchment-dim: #C7BCA8;
+  --color-muted:         #A49A88;
+
+  /* Accent warmth */
+  --color-brown:       #8A7358; /* ≈4.18:1 on ink — NOT for small eyebrow text; AA fails */
+  --color-eyebrow:     #9A8B7A; /* AA-verified: 5.684:1 on ink, 5.383:1 on ink-2, 5.050:1 on ink-3 */
+
+  /* Amber */
+  --color-amber:        #C9A24B; /* 7.838:1 on ink — passes AA at all sizes */
+  --color-amber-bright: #E0B15E;
+  --color-amber-deep:   #A8812F;
+
+  /* Yellow — raincoat accent; /novel pages ONLY; never on home/author surfaces */
+  --color-yellow: #E8C547;
+
+  /* Semantic */
+  --color-success: #8FB08A;
+  --color-error:   #C97A6A;
+
+  /* -----------------------------------------------------------------------
+     FONTS
+     Namespace: --font-* → generates font-serif, font-sans utilities
+     ----------------------------------------------------------------------- */
+  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+
+  /* -----------------------------------------------------------------------
+     TYPE SCALE
+     Namespace: --text-* with double-hyphen modifiers for line-height,
+     letter-spacing, and font-weight.
+     ----------------------------------------------------------------------- */
+
+  /* display — hero headlines */
+  --text-display:                   clamp(2.7rem, 6vw, 5rem);
+  --text-display--line-height:      1.02;
+  --text-display--letter-spacing:   -0.025em;
+  --text-display--font-weight:      430;
+
+  /* headline — section titles */
+  --text-headline:                  clamp(1.9rem, 3.4vw, 2.6rem);
+  --text-headline--line-height:     1.1;
+  --text-headline--letter-spacing:  -0.02em;
+  --text-headline--font-weight:     430;
+
+  /* title — card/sub-section heads */
+  --text-title:                     1.6rem;
+  --text-title--line-height:        1.15;
+  --text-title--font-weight:        430;
+
+  /* body — default prose */
+  --text-body:                      1rem;
+  --text-body--line-height:         1.65;
+  --text-body--font-weight:         300;
+
+  /* lede — intro paragraphs (parchment-dim usage) */
+  --text-lede:                      clamp(1.2rem, 1.4vw, 1.32rem);
+  --text-lede--line-height:         1.55;
+  --text-lede--font-weight:         300;
+
+  /* label — eyebrows, captions, tags (uppercase applied at use site) */
+  --text-label:                     0.74rem;
+  --text-label--font-weight:        500;
+  --text-label--letter-spacing:     0.22em;
+
+  /* epigraph — pull quotes, Fraunces italic (italic applied at use site) */
+  --text-epigraph:                  1.5rem;
+  --text-epigraph--line-height:     1.4;
+  --text-epigraph--font-weight:     400;
+
+  /* -----------------------------------------------------------------------
+     BORDER RADIUS
+     Namespace: --radius-* → generates rounded-sm, rounded-img, rounded-pill
+     ----------------------------------------------------------------------- */
+  --radius-sm:   2px;
+  --radius-img:  3px;
+  --radius-pill: 30px;
+
+  /* -----------------------------------------------------------------------
+     MOTION — easing functions
+     Namespace: --ease-* → generates ease-out, ease-soft utilities
+     Durations kept as plain CSS vars (no Tailwind utility needed).
+     ----------------------------------------------------------------------- */
+  --ease-out:  cubic-bezier(.22, .61, .36, 1);
+  --ease-soft: cubic-bezier(.4, 0, .2, 1);
+
+  /* -----------------------------------------------------------------------
+     BREAKPOINTS
+     Override Tailwind v4 defaults to the project's three-tier system.
+     Namespace: --breakpoint-* → generates sm:*, md:*, lg:* variants
+     ----------------------------------------------------------------------- */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 820px;
+  --breakpoint-lg: 1280px;
+}
+
+/* ==========================================================================
+   LAYOUT TOKENS — plain CSS vars (no Tailwind utility generation needed)
+   1280 frame / 34em measure — ignore the 1080 in mockups + UI Kit §3.
+   ========================================================================== */
+:root {
+  --measure: 34em;     /* capped reading column; never widens */
+  --frame:   1280px;   /* container max-width; gutters fluid */
+
+  /* Line / hairline — translucent parchment overlays */
+  --line:        rgba(236, 227, 210, .12);
+  --line-strong: rgba(236, 227, 210, .22);
+
+  /* Duration tokens — used with var(); no utility classes needed */
+  --t-fast:   180ms;
+  --t:        280ms;
+  --t-slow:   450ms;
+  --t-reveal: 900ms;
+}
+
+/* ==========================================================================
+   GLOBAL BASE LAYER
+   ========================================================================== */
+
+/* Box-sizing reset (Tailwind preflight already does html/body; this catches
+   any edge cases but won't conflict). */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling — disabled for reduced-motion below */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Body defaults: dark ink background, parchment text, Inter 300 */
+body {
+  background: var(--color-ink);
+  color: var(--color-parchment);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessibility: focus ring is NEVER removed.
+   Amber gives 7.838:1 on ink — passes AA at all element sizes. */
+*:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   LAYOUT HELPERS
+   ========================================================================== */
+
+/* Capped reading column — keeps prose lines comfortably short */
+.measure {
+  max-width: var(--measure);
+}
+
+/*
+ * Full-bleed atmosphere layer.
+ * Usage: a sibling/child element with class="atmosphere" stretches edge-to-edge
+ * of the viewport while the text column above it stays capped at --measure.
+ * Pattern: absolute-positioned child inside a relative container, inset:0 +
+ * negative horizontal margins to escape the column's padding.
+ *
+ * The parent section must have `position: relative; overflow: hidden;`
+ * (added at use-site in the section component — not forced here).
+ */
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ==========================================================================
+   REDUCED MOTION
+   Disable smooth scroll; collapse animations/transitions to final states.
+   Phase-specific Reveal / motion components also honor this at their level.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
