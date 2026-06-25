@@ -1,1 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Astro internal cache
+.astro/
+
+# Environment variables (never commit live secrets)
+.env
+
+# Keep .env.example committed (it has no real secrets)
+
+# Superpowers workspace (local only)
 .superpowers/
