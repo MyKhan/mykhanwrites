@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MyKhanWrites — UI Kit (Dusk)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* surfaces */
+    --ink:#14110F; --ink-2:#1B1714; --ink-3:#221D18; --ink-4:#2A241E;
+    /* text */
+    --parchment:#ECE3D2; --parchment-dim:#C7BCA8; --muted:#A49A88;
+    /* accent */
+    --amber:#C9A24B; --amber-bright:#E0B15E; --amber-deep:#A8812F;
+    --yellow:#E8C547;
+    /* lines + states */
+    --line:rgba(236,227,210,.12); --line-strong:rgba(236,227,210,.22);
+    --success:#8FB08A; --error:#C97A6A;
+    /* type + motion */
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+    --ease-out:cubic-bezier(.22,.61,.36,1); --ease-soft:cubic-bezier(.4,0,.2,1);
+    --t-fast:180ms; --t:280ms; --t-slow:450ms; --t-reveal:900ms;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ink); color:var(--parchment); font-family:var(--sans); font-weight:300; line-height:1.65; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 32px}
+  h1,h2,h3,h4{font-family:var(--serif); font-weight:400; line-height:1.1}
+  a{color:inherit}
+
+  /* top bar */
+  .topbar{position:sticky; top:0; z-index:40; background:rgba(20,17,15,.8); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex; justify-content:space-between; align-items:center; height:64px}
+  .topbar .name{font-family:var(--serif); font-size:1.05rem; letter-spacing:.04em}
+  .topbar .meta{font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--amber)}
+
+  /* section scaffold */
+  .sec{padding:70px 0; border-top:1px solid var(--line)}
+  .kicker{font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; color:var(--amber); margin-bottom:8px}
+  .sec h2{font-size:1.9rem; margin-bottom:6px}
+  .sec .note{color:var(--muted); font-size:.92rem; max-width:42em; margin-bottom:34px}
+  .intro{padding:58px 0 10px}
+  .intro h1{font-size:clamp(2.2rem,5vw,3.4rem); letter-spacing:-.02em}
+  .intro p{color:var(--parchment-dim); margin-top:14px; max-width:40em; font-size:1.08rem}
+
+  /* swatches */
+  .swatches{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px}
+  .sw{border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--ink-2)}
+  .sw .chip{height:78px}
+  .sw .meta{padding:10px 12px}
+  .sw .nm{font-size:.82rem; color:var(--parchment)}
+  .sw .hx{font-size:.72rem; color:var(--muted); letter-spacing:.04em; margin-top:2px; text-transform:uppercase}
+
+  /* type specimens */
+  .spec{border-top:1px solid var(--line); padding:22px 0; display:grid; grid-template-columns:128px 1fr; gap:24px; align-items:baseline}
+  .spec .tag{font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); padding-top:8px}
+  .d1{font-size:clamp(2.6rem,6vw,4.4rem); font-weight:440; letter-spacing:-.02em; line-height:1.02}
+  .h2s{font-size:2.3rem; font-style:italic}
+  .h3s{font-size:1.6rem}
+  .eyb{font-family:var(--sans); font-size:.74rem; letter-spacing:.22em; text-transform:uppercase; color:var(--amber); font-weight:500}
+  .lede{font-size:1.24rem; color:var(--parchment-dim); font-weight:300}
+  .bodyt{font-size:1rem; color:var(--parchment); max-width:40em}
+  .small{font-size:.8rem; color:var(--muted)}
+  .epi{font-family:var(--serif); font-style:italic; font-size:1.5rem; line-height:1.4; color:var(--parchment); border-left:2px solid var(--amber); padding-left:20px; max-width:30em}
+
+  /* buttons + links */
+  .row{display:flex; gap:22px; align-items:center; flex-wrap:wrap; margin-bottom:24px}
+  .btn{display:inline-block; padding:.92em 1.7em; border-radius:var(--radius); font-size:.82rem; letter-spacing:.13em; text-transform:uppercase; font-weight:500; border:1px solid var(--amber); color:var(--ink); background:var(--amber); transition:transform var(--t) var(--ease-out), background var(--t)}
+  .btn:hover{background:var(--amber-bright); border-color:var(--amber-bright); transform:translateY(-2px)}
+  .btn-ghost{background:transparent; color:var(--amber)}
+  .btn-ghost:hover{background:rgba(201,162,75,.1); color:var(--amber-bright); transform:translateY(-2px)}
+  .u-link{position:relative; color:var(--parchment); font-size:.92rem}
+  .u-link::after{content:""; position:absolute; left:0; bottom:-4px; height:1px; width:100%; background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform var(--t) var(--ease-out)}
+  .u-link:hover{color:var(--amber)} .u-link:hover::after{transform:scaleX(1)}
+  .arrow{font-size:.9rem; color:var(--parchment); border-bottom:1px solid var(--line); padding-bottom:3px; transition:color var(--t),border-color var(--t)}
+  .arrow:hover{color:var(--amber); border-color:var(--amber)}
+  .quiet{font-size:.86rem; color:var(--muted); transition:color var(--t)} .quiet:hover{color:var(--parchment)}
+  .inline-link{color:var(--amber); border-bottom:1px solid rgba(201,162,75,.4)} .inline-link:hover{border-color:var(--amber)}
+  .focus-demo:focus-visible{outline:2px solid var(--amber); outline-offset:3px}
+
+  /* cards + surfaces */
+  .cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:18px}
+  .card{border:1px solid var(--line); border-radius:var(--radius); padding:30px; background:var(--ink-3); transition:transform var(--t) var(--ease-out), border-color var(--t)}
+  .card:hover{border-color:rgba(201,162,75,.4); transform:translateY(-3px)}
+  .card h3{font-size:1.4rem; margin-bottom:8px}
+  .card p{color:var(--parchment-dim); font-size:.96rem}
+
+  /* form */
+  .form{display:flex; gap:12px; flex-wrap:wrap; max-width:520px}
+  .form input{flex:1; min-width:220px; background:var(--ink-3); border:1px solid var(--line); color:var(--parchment); padding:.9em 1.05em; border-radius:var(--radius); font-family:var(--sans); font-size:.95rem; transition:border-color var(--t)}
+  .form input::placeholder{color:var(--muted)} .form input:focus{outline:none; border-color:var(--amber)}
+  .states{display:flex; gap:24px; margin-top:18px; font-size:.86rem}
+  .ok{color:var(--success)} .err{color:var(--error)}
+
+  /* motion demos */
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity var(--t-reveal) var(--ease-out), transform var(--t-reveal) var(--ease-out)}
+  .reveal.in{opacity:1; transform:none}
+  .token-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-top:8px}
+  .tok{border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; background:var(--ink-2)}
+  .tok .k{font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--amber)}
+  .tok .v{font-size:.92rem; color:var(--parchment); margin-top:6px; font-family:var(--sans)}
+  .tok .d{font-size:.78rem; color:var(--muted); margin-top:4px}
+
+  /* spacing scale */
+  .space-row{display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap}
+  .space-row .bar{background:linear-gradient(180deg,var(--amber),var(--amber-deep)); width:34px; border-radius:1px}
+  .space-row .bar span{display:block; text-align:center; margin-top:6px; font-size:.7rem; color:var(--muted)}
+
+  /* imagery duotone */
+  .img-demo{display:grid; grid-template-columns:1fr 1fr; gap:18px; max-width:680px}
+  .img-card{border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; min-height:200px; position:relative; display:flex; align-items:flex-end}
+  .img-raw{background:linear-gradient(135deg,#3a4a55,#7d6a54 60%,#9c8a6f)}
+  .img-duo{background:linear-gradient(135deg,#14110F,#5a4528 55%,#E8D6B0); filter:saturate(.85)}
+  .img-card .cap{position:relative; z-index:2; padding:12px 14px; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--parchment); background:linear-gradient(0deg,rgba(20,17,15,.7),transparent)}
+  .img-card .grainy{position:absolute; inset:0; opacity:.08; mix-blend-mode:overlay; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  /* crane */
+  .crane{color:var(--amber); width:46px; height:46px}
+
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1; transform:none; transition:none}}
+
+  /* grain overlay */
+  .grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.06; mix-blend-mode:overlay; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .badge{position:fixed; left:16px; bottom:16px; z-index:90; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); background:rgba(20,17,15,.85); border:1px solid var(--line); padding:7px 12px; border-radius:20px}
+</style>
+</head>
+<body>
+<svg style="display:none"><symbol id="crane" viewBox="0 0 100 100"><path d="M14 60 L42 51 M42 51 L60 28 L70 64 M42 51 L70 64 L44 80 Z M70 64 L90 55" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+
+<div class="topbar"><div class="wrap">
+  <span class="name">Meher Yar Khan</span>
+  <span class="meta">UI Kit · Dusk</span>
+</div></div>
+
+<div class="wrap">
+
+  <section class="intro">
+    <svg class="crane" style="margin-bottom:14px"><use href="#crane"/></svg>
+    <h1>The design system</h1>
+    <p>A living styleguide for MyKhanWrites.com — dusk palette, sharp editorial structure, Fraunces &amp; Inter, a single amber accent, film grain, and refined micro-motion. Scroll: the sections themselves fade up the way the real site will.</p>
+  </section>
+
+  <!-- COLOR -->
+  <section class="sec reveal">
+    <p class="kicker">01 — Colour</p>
+    <h2>Palette</h2>
+    <p class="note">A warm near-black world lit by a single amber. Text tiers are tuned to meet WCAG AA on the dark surfaces. The raincoat-yellow appears only on novel-specific accents.</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#14110F"></div><div class="meta"><div class="nm">Ink — page</div><div class="hx">#14110F</div></div></div>
+      <div class="sw"><div class="chip" style="background:#1B1714"></div><div class="meta"><div class="nm">Ink 2 — bands</div><div class="hx">#1B1714</div></div></div>
+      <div class="sw"><div class="chip" style="background:#221D18"></div><div class="meta"><div class="nm">Ink 3 — cards</div><div class="hx">#221D18</div></div></div>
+      <div class="sw"><div class="chip" style="background:#2A241E"></div><div class="meta"><div class="nm">Ink 4 — inputs</div><div class="hx">#2A241E</div></div></div>
+      <div class="sw"><div class="chip" style="background:#ECE3D2"></div><div class="meta"><div class="nm">Parchment — text</div><div class="hx">#ECE3D2</div></div></div>
+      <div class="sw"><div class="chip" style="background:#C7BCA8"></div><div class="meta"><div class="nm">Parchment dim</div><div class="hx">#C7BCA8</div></div></div>
+      <div class="sw"><div class="chip" style="background:#A49A88"></div><div class="meta"><div class="nm">Muted — labels</div><div class="hx">#A49A88</div></div></div>
+      <div class="sw"><div class="chip" style="background:#C9A24B"></div><div class="meta"><div class="nm">Amber — accent</div><div class="hx">#C9A24B</div></div></div>
+      <div class="sw"><div class="chip" style="background:#E0B15E"></div><div class="meta"><div class="nm">Amber bright — hover</div><div class="hx">#E0B15E</div></div></div>
+      <div class="sw"><div class="chip" style="background:#A8812F"></div><div class="meta"><div class="nm">Amber deep — press</div><div class="hx">#A8812F</div></div></div>
+      <div class="sw"><div class="chip" style="background:#E8C547"></div><div class="meta"><div class="nm">Raincoat — novel only</div><div class="hx">#E8C547</div></div></div>
+      <div class="sw"><div class="chip" style="background:#8FB08A"></div><div class="meta"><div class="nm">Success</div><div class="hx">#8FB08A</div></div></div>
+      <div class="sw"><div class="chip" style="background:#C97A6A"></div><div class="meta"><div class="nm">Error</div><div class="hx">#C97A6A</div></div></div>
+    </div>
+  </section>
+
+  <!-- TYPE -->
+  <section class="sec reveal">
+    <p class="kicker">02 — Typography</p>
+    <h2>Type scale</h2>
+    <p class="note">Fraunces for display &amp; headings (warmth + character); Inter for body &amp; UI (crisp, readable on dark). Italic Fraunces carries epigraphs and the novel cue.</p>
+    <div class="spec"><div class="tag">Display / H1</div><div class="d1">Warm stories with cold corners.</div></div>
+    <div class="spec"><div class="tag">H2 · italic</div><div class="h2s">They Only Came When It Rained</div></div>
+    <div class="spec"><div class="tag">H3</div><div class="h3s">Fiction</div></div>
+    <div class="spec"><div class="tag">Eyebrow</div><div class="eyb">The author</div></div>
+    <div class="spec"><div class="tag">Lede</div><div class="lede">Lonely people, hidden selves, and the places they go to feel less alone.</div></div>
+    <div class="spec"><div class="tag">Body</div><div class="bodyt">He has the same single espresso at the same hour while unconsciously folding paper cranes between customers. Then, on certain rainy nights, a narrow passage opens where no passage should be.</div></div>
+    <div class="spec"><div class="tag">Caption</div><div class="small">Image pending — rainy Japanese station café at dusk</div></div>
+    <div class="spec"><div class="tag">Epigraph</div><div class="epi">The glass walls reflect people twice, so everyone looks like they're going somewhere and coming back at the same time.</div></div>
+  </section>
+
+  <!-- BUTTONS + LINKS -->
+  <section class="sec reveal">
+    <p class="kicker">03 — Buttons &amp; links</p>
+    <h2>Actions</h2>
+    <p class="note">Hover the elements below — the underline draws in, buttons lift and brighten. One filled primary; everything else is quiet.</p>
+    <div class="row">
+      <a class="btn focus-demo" href="#">Read the first pages</a>
+      <a class="btn btn-ghost focus-demo" href="#">Enter the novel world →</a>
+    </div>
+    <div class="row">
+      <a class="u-link" href="#">Underline-draw link</a>
+      <a class="arrow" href="#">Read about the novel →</a>
+      <a class="quiet" href="#">Meet the author</a>
+      <span class="bodyt" style="font-size:.95rem">An inline <a class="inline-link" href="#">text link</a> inside a sentence.</span>
+    </div>
+    <p class="small">Focus: tab to the buttons to see the amber focus ring (keyboard accessibility).</p>
+  </section>
+
+  <!-- SURFACES -->
+  <section class="sec reveal">
+    <p class="kicker">04 — Surfaces</p>
+    <h2>Cards &amp; bands</h2>
+    <p class="note">Flat, dark, defined by hairlines rather than shadows. Cards lift a few pixels and warm their border on hover.</p>
+    <div class="cards">
+      <div class="card"><h3>Fiction</h3><p>Novels and stories, warm at the center and darker at the edges.</p></div>
+      <div class="card"><h3>Screen</h3><p>Screenwriting, including a psychological thriller.</p></div>
+      <div class="card"><h3>Other worlds</h3><p>Where a story becomes a place you can step into.</p></div>
+    </div>
+  </section>
+
+  <!-- FORMS -->
+  <section class="sec reveal">
+    <p class="kicker">05 — Forms</p>
+    <h2>Inputs</h2>
+    <p class="note">Quiet fields on a slightly raised surface; the border warms to amber on focus.</p>
+    <form class="form" onsubmit="return false">
+      <input type="email" placeholder="your@email.com" aria-label="Email" />
+      <button class="btn" type="submit">Send me the first pages</button>
+    </form>
+    <div class="states">
+      <span class="ok">✓ Check your inbox — the first pages are on their way.</span>
+      <span class="err">✕ That didn't go through. Try again.</span>
+    </div>
+  </section>
+
+  <!-- IMAGERY -->
+  <section class="sec reveal">
+    <p class="kicker">06 — Imagery</p>
+    <h2>Warm duotone</h2>
+    <p class="note">Photos and the novel scene are tinted toward the palette — shadows to ink, highlights to warm gold — then dusted with grain, so images feel part of the same world. Left: natural. Right: the treatment.</p>
+    <div class="img-demo">
+      <div class="img-card img-raw"><div class="grainy"></div><div class="cap">Natural</div></div>
+      <div class="img-card img-duo"><div class="grainy"></div><div class="cap">Warm duotone + grain</div></div>
+    </div>
+  </section>
+
+  <!-- MOTION -->
+  <section class="sec reveal">
+    <p class="kicker">07 — Motion</p>
+    <h2>Micro-motion spec</h2>
+    <p class="note">Refined &amp; subtle: motion you feel more than notice. Everything respects <em>prefers-reduced-motion</em>.</p>
+    <div class="token-grid">
+      <div class="tok"><div class="k">Scroll reveal</div><div class="v">opacity + 18px rise</div><div class="d">900ms ease-out, once, on enter</div></div>
+      <div class="tok"><div class="k">Hero intro</div><div class="v">staggered fade-settle</div><div class="d">eyebrow→title→lede→CTAs, ~80ms apart</div></div>
+      <div class="tok"><div class="k">Link underline</div><div class="v">scaleX 0→1 from left</div><div class="d">280ms ease-out</div></div>
+      <div class="tok"><div class="k">Button hover</div><div class="v">lift 2px + brighten</div><div class="d">280ms ease-out</div></div>
+      <div class="tok"><div class="k">Page transition</div><div class="v">crossfade</div><div class="d">~320ms · Astro View Transitions</div></div>
+      <div class="tok"><div class="k">Hero parallax</div><div class="v">image drifts ~12%</div><div class="d">gentle; off on mobile + reduced-motion</div></div>
+    </div>
+    <p class="small" style="margin-top:16px">Page transitions &amp; parallax can't show on one static page — they're wired in the real Astro build. The scroll-reveal and hover effects on this page are the real thing.</p>
+  </section>
+
+  <!-- TOKENS -->
+  <section class="sec reveal">
+    <p class="kicker">08 — Foundations</p>
+    <h2>Spacing, radius, easing</h2>
+    <p class="note">8-px spacing rhythm; near-zero radius for the sharp editorial feel; two eases do all the work.</p>
+    <div class="space-row" style="margin-bottom:30px">
+      <div class="bar" style="height:4px"><span>4</span></div>
+      <div class="bar" style="height:8px"><span>8</span></div>
+      <div class="bar" style="height:12px"><span>12</span></div>
+      <div class="bar" style="height:16px"><span>16</span></div>
+      <div class="bar" style="height:24px"><span>24</span></div>
+      <div class="bar" style="height:32px"><span>32</span></div>
+      <div class="bar" style="height:48px"><span>48</span></div>
+      <div class="bar" style="height:64px"><span>64</span></div>
+      <div class="bar" style="height:96px"><span>96</span></div>
+    </div>
+    <div class="token-grid">
+      <div class="tok"><div class="k">Radius</div><div class="v">2px</div><div class="d">buttons, cards, inputs (3px images)</div></div>
+      <div class="tok"><div class="k">Container</div><div class="v">1080px / 28–32px gutter</div><div class="d">section padding 96px (64 mobile)</div></div>
+      <div class="tok"><div class="k">Ease — out</div><div class="v">cubic-bezier(.22,.61,.36,1)</div><div class="d">reveals, hovers</div></div>
+      <div class="tok"><div class="k">Hairline</div><div class="v">1px rgba(236,227,210,.12)</div><div class="d">dividers, borders</div></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="badge">UI Kit preview · Dusk</div>
+<div class="grain"></div>
+
+<script>
+  const obs = new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target)}})},{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
