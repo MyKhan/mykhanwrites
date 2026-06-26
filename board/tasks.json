@@ -1,7 +1,7 @@
 {
   "title": "MyKhanWrites — Launch Board",
   "subtitle": "Everything still on Meher's side before go-live. The build is feature-complete; these are creds, assets, and sign-offs.",
-  "updatedAt": null,
+  "updatedAt": "2026-06-26T09:56:19.493Z",
   "columns": [
     {
       "id": "todo",
@@ -143,12 +143,12 @@
       "category": "Pre-launch check",
       "priority": "high",
       "gate": false,
-      "detail": "Run axe against the full-site build (all 5 routes + 404). Deferred in-session (no headless Chrome). Exact command + setup in the phase-12 report. `npm run verify:a11y`.",
+      "detail": "✅ DONE this session (commit 8be2740): axe ran on all routes + 404 + coming-soon → 0 violations, after fixing 3 real issues (landmark-unique, missing h1 ×2, .ap-photo-label contrast). Re-run: `npm run verify:a11y` (needs a chromedriver matching your Chrome version).",
       "source": {
         "file": ".superpowers/sdd/phase-12-report.md",
         "ref": "phase-12 report (axe commands)"
       },
-      "column": "todo"
+      "column": "done"
     },
     {
       "id": "check-lighthouse",
@@ -156,12 +156,12 @@
       "category": "Pre-launch check",
       "priority": "high",
       "gate": false,
-      "detail": "Run Lighthouse CI on home + novel. .lighthouserc.json and the exact command are in the phase-12 report. Target ≥90 on all four categories.",
+      "detail": "✅ DONE this session: Lighthouse CI (.lighthouserc.json) → Performance 99, Accessibility 100, Best-Practices 100 on all pages. SEO 100 at launch (66 in prelaunch is ONLY the robots.txt Disallow:/ block — recovers automatically on the launch flip; proven). Re-run: `npm run verify:lh`.",
       "source": {
         "file": ".superpowers/sdd/phase-12-report.md",
         "ref": "phase-12 report (Lighthouse)"
       },
-      "column": "todo"
+      "column": "done"
     },
     {
       "id": "check-links",
