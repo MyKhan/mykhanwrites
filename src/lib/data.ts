@@ -63,7 +63,11 @@ const SiteSchema = z.object({
   contactReasons: z.array(z.string()),
   states: z.object({
     newsletterSuccess: z.string(),
-    newsletterError: z.string(),
+    // prefix/suffix wrap an obfuscated email link (rendered, never stored raw)
+    newsletterError: z.object({
+      prefix: z.string(),
+      suffix: z.string(),
+    }),
     contactSuccess: z.string(),
     contactError: z.object({
       prefix: z.string(),
@@ -76,7 +80,11 @@ const SiteSchema = z.object({
   }),
   pending: z.object({
     kitPending: z.string(),
-    web3formsPending: z.string(),
+    // prefix/suffix wrap an obfuscated email link (rendered, never stored raw)
+    web3formsPending: z.object({
+      prefix: z.string(),
+      suffix: z.string(),
+    }),
   }),
   authorPhotoAlt: z.string(),
   comingSoon: z.object({
@@ -90,6 +98,13 @@ const SiteSchema = z.object({
   }),
   aboutPreview: z.object({
     teaser: z.string(),
+  }),
+  // Short structural page labels — kept in data so all copy is editable here.
+  labels: z.object({
+    authorEyebrow: z.string(),
+    aboutHeading: z.string(),
+    contactEyebrow: z.string(),
+    contactHeading: z.string(),
   }),
 });
 
@@ -132,6 +147,8 @@ const WritingSchema = z.object({
 const ScreenSchema = z.object({
   published: z.boolean(),
   selectedWorkLabel: z.string(),
+  heading: z.string(),
+  subhead: z.string(),
   logline: z.string(),
   synopsis: z.string(),
   themes: z.array(z.string()),

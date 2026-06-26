@@ -147,7 +147,11 @@ const formAction = isPending ? '#' : 'https://api.web3forms.com/submit';
 
   {isPending && (
     <p class="contact-form__pending" role="status">
-      {site.pending.web3formsPending}
+      {site.pending.web3formsPending.prefix}<a
+        href={mailtoHref}
+        set:html={encodedEmail}
+        data-umami-event={EVENTS.EMAIL_CLICK}
+      />{site.pending.web3formsPending.suffix}
     </p>
   )}
 

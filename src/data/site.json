@@ -67,7 +67,10 @@
   },
   "states": {
     "newsletterSuccess": "Check your inbox — the first pages are on their way. (If nothing arrives, peek in spam and add me to your contacts.)",
-    "newsletterError": "That didn't go through. Try again, or email hello@mykhanwrites.com.",
+    "newsletterError": {
+      "prefix": "That didn't go through. Try again, or email ",
+      "suffix": "."
+    },
     "contactSuccess": "Thank you — your note's with me. I read everything, and I'll reply when I can.",
     "contactError": {
       "prefix": "Something went wrong sending that. Email ",
@@ -80,7 +83,10 @@
   },
   "pending": {
     "kitPending": "Newsletter signup launching soon — check back shortly.",
-    "web3formsPending": "Contact form launching soon — email hello@mykhanwrites.com in the meantime."
+    "web3formsPending": {
+      "prefix": "Contact form launching soon — email ",
+      "suffix": " in the meantime."
+    }
   },
   "authorPhotoAlt": "Meher Yar Khan, the author, in soft window light.",
   "comingSoon": {
@@ -94,5 +100,11 @@
   },
   "aboutPreview": {
     "teaser": "Meher Yar Khan is a Pakistani-Finnish writer and digital nomad who has been making up stories since he was ten — a different monster on every page. They Only Came When It Rained is his first novel. He also builds writing tools, including Compare My Drafts."
+  },
+  "labels": {
+    "authorEyebrow": "Meher Yar Khan · Writer",
+    "aboutHeading": "About",
+    "contactEyebrow": "Get in touch",
+    "contactHeading": "Contact"
   }
 }
