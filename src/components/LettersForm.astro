@@ -45,6 +45,11 @@ const isPending = !KIT_FORM_ID || String(KIT_FORM_ID).trim() === '';
 const formAction = isPending
   ? '#'
   : `https://app.kit.com/forms/${KIT_FORM_ID}/subscriptions`;
+
+// Distinct accessible names per variant so the mid-page and footer signup
+// forms are not duplicate `form` landmarks on pages that render both
+// (axe landmark-unique). Both keep an accessible name for screen readers.
+const formLabel = variant === 'full' ? 'Newsletter signup' : 'Footer newsletter signup';
 ---
 
 <div id={variant === 'full' ? 'letters' : undefined} class:list={['letters-form', `letters-form--${variant}`]}>
@@ -62,7 +67,7 @@ const formAction = isPending
     method="POST"
     action={formAction}
     data-astro-reload
-    aria-label="Newsletter signup"
+    aria-label={formLabel}
   >
     {/* Supplemental hidden tag fields — dashboard config is authoritative */}
     {!isPending && (

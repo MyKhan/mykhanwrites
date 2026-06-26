@@ -99,10 +99,11 @@ import ArrowLink from './primitives/ArrowLink.astro';
     font-weight: 300;
     letter-spacing: 0.08em;
     text-align: center;
+    /* muted on ink-3 = 6.01:1 (AA). No opacity — it composites the text toward
+       the background and drops effective contrast below AA (axe color-contrast). */
     color: var(--color-muted);
     text-transform: uppercase;
     line-height: 1.5;
-    opacity: 0.6;
   }
 
   /* Text column */

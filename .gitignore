@@ -8,6 +8,9 @@ dist-*/
 # Astro internal cache
 .astro/
 
+# Lighthouse CI local report output
+.lighthouseci/
+
 # Environment variables (never commit live secrets)
 .env
 
