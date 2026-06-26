@@ -33,6 +33,7 @@
 
 import { frauncesRomanLatinUrl } from '../lib/fonts';
 import { buildSeoMeta, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from '../lib/seo';
+import { SITE_ORIGIN } from '../lib/siteOrigin';
 import '../styles/global.css';
 
 interface Props {
@@ -44,8 +45,8 @@ interface Props {
 
 const { title, description, ogImage, noindex = false } = Astro.props;
 
-// Derive site origin from Astro.site (astro.config.mjs => https://www.mykhanwrites.com)
-const siteOrigin = Astro.site ? Astro.site.origin : 'https://www.mykhanwrites.com';
+// Derive site origin from Astro.site (astro.config.mjs); SITE_ORIGIN is the shared fallback.
+const siteOrigin = Astro.site ? Astro.site.origin : SITE_ORIGIN;
 
 const seo = buildSeoMeta({
   title,

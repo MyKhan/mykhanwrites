@@ -16,9 +16,7 @@
  */
 
 import { site, novel } from './data';
-
-/** The canonical site origin — must match Astro.site in astro.config.mjs */
-const SITE_ORIGIN = 'https://www.mykhanwrites.com';
+import { SITE_ORIGIN } from './siteOrigin';
 
 /** Stable @id for the Person entity, referenced from Book */
 export const PERSON_ID = `${SITE_ORIGIN}/#person`;

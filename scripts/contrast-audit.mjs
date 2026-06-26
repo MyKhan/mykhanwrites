@@ -10,31 +10,39 @@
  *   L = 0.2126·R + 0.7152·G + 0.0722·B  (linearised)
  *   Contrast = (L_lighter + 0.05) / (L_darker + 0.05)
  *
- * Token source: src/styles/global.css @theme block (frozen here for audit).
+ * Token source: parsed live from src/styles/global.css @theme block — single
+ *   source of truth, no frozen copy that can silently drift from the real tokens.
  * Run: node scripts/contrast-audit.mjs
  */
 
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
 // ---------------------------------------------------------------------------
-// Color tokens (hex → pulled from global.css @theme, authoritative as built)
+// Color tokens — parsed live from src/styles/global.css @theme block.
+// Matches `--color-<name>: #RRGGBB;`; rgba()/non-hex tokens (e.g. lines) are
+// skipped (the audit only references hex tokens). This keeps the AA gate
+// honest: if a token's hex changes in global.css, the audit re-reads it.
 // ---------------------------------------------------------------------------
-const TOKENS = {
-  ink:          '#14110F',
-  'ink-2':      '#1B1714',
-  'ink-3':      '#221D18',
-  'ink-4':      '#2A241E',
-  'ink-deep':   '#100D0B',
-  parchment:    '#ECE3D2',
-  'parchment-dim': '#C7BCA8',
-  muted:        '#A49A88',
-  brown:        '#8A7358',
-  eyebrow:      '#9A8B7A',
-  amber:        '#C9A24B',
-  'amber-bright': '#E0B15E',
-  'amber-deep':  '#A8812F',
-  yellow:       '#E8C547',
-  success:      '#8FB08A',
-  error:        '#C97A6A',
-};
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const GLOBAL_CSS = resolve(__dirname, '../src/styles/global.css');
+
+function parseColorTokens(cssPath) {
+  const css = readFileSync(cssPath, 'utf8');
+  const tokens = {};
+  const re = /--color-([a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{6})\b/g;
+  let m;
+  while ((m = re.exec(css)) !== null) {
+    tokens[m[1]] = m[2].toUpperCase();
+  }
+  if (Object.keys(tokens).length === 0) {
+    throw new Error(`No --color-* hex tokens found in ${cssPath}`);
+  }
+  return tokens;
+}
+
+const TOKENS = parseColorTokens(GLOBAL_CSS);
 
 // ---------------------------------------------------------------------------
 // Relative luminance (W3C formula)
@@ -146,6 +154,19 @@ const dedupedPairs = PAIRS.filter(p => {
   seen.add(key);
   return true;
 });
+
+// ---------------------------------------------------------------------------
+// Drift guard — fail fast if the audit references a token that no longer
+// exists in global.css (e.g. a token was renamed or removed at the source).
+// ---------------------------------------------------------------------------
+const referenced = new Set(PAIRS.flatMap(p => [p.text, p.bg]));
+const missing = [...referenced].filter(t => !(t in TOKENS));
+if (missing.length) {
+  console.error(
+    `\x1b[31m✗ Tokens referenced by the audit but missing from global.css: ${missing.join(', ')}\x1b[0m`,
+  );
+  process.exit(1);
+}
 
 // ---------------------------------------------------------------------------
 // Run the audit

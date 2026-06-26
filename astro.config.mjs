@@ -2,11 +2,12 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import { SITE_ORIGIN } from './src/lib/siteOrigin.ts';
 
 // Note: <ClientRouter /> (View Transitions) will be wired into BaseLayout in Phase 4.
 
 export default defineConfig({
-  site: 'https://www.mykhanwrites.com',
+  site: SITE_ORIGIN,
 
   // Static output is Astro's default — emits to dist/
   // output: 'static' is implicit
