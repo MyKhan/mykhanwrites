@@ -22,10 +22,15 @@ npm run test       # Vitest unit tests
 
 All environment variables are set at **build time** — they are baked into the static HTML and never exposed at runtime beyond what appears in the page source.
 
-| Variable                        | Required    | Default    | What it does |
-|---------------------------------|-------------|------------|--------------|
-| `PRELAUNCH`                     | Yes         | `true`     | `true` → homepage renders the coming-soon/capture page. `false` → homepage renders the full author home. **Safe default: always `true` unless you're doing a launch flip.** |
-| `SCREEN_PUBLISHED`              | No          | `false`    | `true` → the `/screen` route is built into `dist/` and publicly accessible. `false` → the route is suppressed at build time (no `dist/screen/` directory emitted). **Do NOT set to `true` until US Copyright is filed (C4 — hard blocker).** |
+> **Site mode lives in [`SETTINGS.md`](./SETTINGS.md), not in `.env`.** `PRELAUNCH` and
+> `SCREEN_PUBLISHED` are edited there as plain `true`/`false` values — no code to touch.
+> A build-time env var of the same name still overrides the file for one-off / CI builds
+> (the commands below use that). A bad value in `SETTINGS.md` fails the build with a clear message.
+
+| Variable                        | Set in        | Default    | What it does |
+|---------------------------------|---------------|------------|--------------|
+| `PRELAUNCH`                     | `SETTINGS.md` | `true`     | `true` → homepage renders the coming-soon/capture page. `false` → homepage renders the full author home. **Safe default: always `true` unless you're doing a launch flip.** |
+| `SCREEN_PUBLISHED`              | `SETTINGS.md` | `false`    | `true` → the `/screen` route is built into `dist/` and publicly accessible. `false` → the route is suppressed at build time (no `dist/screen/` directory emitted). **Do NOT set to `true` until US Copyright is filed (C4 — hard blocker).** |
 | `PUBLIC_KIT_FORM_ID`            | No          | _(empty)_  | Kit (ConvertKit) form ID. When absent, the LettersForm submit button is disabled and a "coming soon" notice renders instead. |
 | `PUBLIC_WEB3FORMS_ACCESS_KEY`   | No          | _(empty)_  | Web3Forms access key for the contact form. When absent, the ContactForm shows a "pending" state — the form fields render but submission is disabled. |
 | `PUBLIC_UMAMI_ID`               | No          | _(empty)_  | Umami site ID (website UUID). When absent, the Umami analytics script is omitted from the HTML entirely — no tracking. |
@@ -33,9 +38,7 @@ All environment variables are set at **build time** — they are baked into the 
 **Store in `.env` (never commit):**
 
 ```bash
-# .env — gitignored
-PRELAUNCH=true
-SCREEN_PUBLISHED=false
+# .env — gitignored  (PRELAUNCH / SCREEN_PUBLISHED live in SETTINGS.md, not here)
 PUBLIC_KIT_FORM_ID=your_kit_form_id_here
 PUBLIC_WEB3FORMS_ACCESS_KEY=your_web3forms_key_here
 PUBLIC_UMAMI_ID=your_umami_website_uuid_here
@@ -189,7 +192,7 @@ Run this checklist when ready to go fully public. Do NOT flip until all hard blo
 
 ### Flip steps
 
-1. Set `PRELAUNCH=false` in your build environment.
+1. In [`SETTINGS.md`](./SETTINGS.md), set `- PRELAUNCH: false`. _(Or, for CI/one-off: `PRELAUNCH=false npm run build`.)_
 2. Run `npm run build` — the full site is emitted to `dist/`.
 3. Upload the new `dist/` to Hostinger `public_html/` (overwrite).
 4. In `public_html/.htaccess`, **comment out the entire Basic-Auth gate block** — from `AuthType Basic` through the last `SetEnvIf` line. The caching and clean-URL blocks stay active.
