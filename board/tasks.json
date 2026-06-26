@@ -1,7 +1,7 @@
 {
   "title": "MyKhanWrites — Launch Board",
   "subtitle": "Everything still on Meher's side before go-live. The build is feature-complete; these are creds, assets, and sign-offs.",
-  "updatedAt": "2026-06-26T09:56:19.493Z",
+  "updatedAt": "2026-06-26T10:39:57.968Z",
   "columns": [
     {
       "id": "todo",
@@ -169,12 +169,12 @@
       "category": "Pre-launch check",
       "priority": "med",
       "gate": false,
-      "detail": "Internal links pass (`npm run verify:links`). Before launch, click through the real external links (Instagram, comparemydrafts.com, onlywhenitrains.com, ManTalksMedia) against the live site.",
+      "detail": "✅ DONE this session: external-link smoke test — Instagram, comparemydrafts.com, onlywhenitrains.com, ManTalksMedia all return 200; api.web3forms.com/submit returns 403 on GET (expected, POST-only). Click through once more on the live site after deploy.",
       "source": {
         "file": "docs/PENDING_ASSETS.md",
         "ref": "Functional checks"
       },
-      "column": "todo"
+      "column": "done"
     },
     {
       "id": "check-jsonld",
@@ -182,12 +182,12 @@
       "category": "Pre-launch check",
       "priority": "med",
       "gate": false,
-      "detail": "Validate the Person (/about) and Book (/novel) JSON-LD with Google's Rich Results Test once the site is reachable.",
+      "detail": "✅ DONE this session: Person (/about) + Book (/novel) JSON-LD validated locally — valid JSON, all required fields, Book.author cross-links to Person @id, sameAs Instagram-only. Run Google Rich Results Test once the site is public for final confirmation.",
       "source": {
         "file": ".superpowers/sdd/phase-12-report.md",
         "ref": "phase-12 report"
       },
-      "column": "todo"
+      "column": "done"
     },
     {
       "id": "check-contact-reason",
@@ -195,12 +195,12 @@
       "category": "Pre-launch check",
       "priority": "med",
       "gate": false,
-      "detail": "The reason-preselect (I1) fix is code-correct but unverified in a real browser. With a configured Web3Forms key, open /contact?reason=screen and confirm 'Film / screen' is pre-selected after the form hydrates.",
+      "detail": "✅ DONE this session: browser-verified (puppeteer + dummy Web3Forms key to force the clone path) — /contact?reason=screen pre-selects \"Film / screen\" after hydration. The I1 fix is confirmed in a real browser.",
       "source": {
         "file": ".superpowers/sdd/final-review-report.md",
         "ref": "final review — Important #1"
       },
-      "column": "todo"
+      "column": "done"
     },
     {
       "id": "asset-author-photo",
@@ -312,12 +312,12 @@
       "category": "Decision (deferred minor)",
       "priority": "low",
       "gate": false,
-      "detail": "site.json web3formsPending / newsletterError embed the raw hello@ address (only shown in the degraded no-key state). Deliberately public, but defeats obfuscation there. Keep as-is, or have me render it obfuscated?",
+      "detail": "✅ SETTLED (commit eeeaf24): render obfuscated. newsletterError + web3formsPending are now {prefix,suffix} with an obfuscated mailto link between — no raw address in the built HTML, even in the degraded no-key state.",
       "source": {
         "file": ".superpowers/sdd/final-review-report.md",
         "ref": "final review — Minor"
       },
-      "column": "todo"
+      "column": "done"
     },
     {
       "id": "decide-labels",
@@ -325,12 +325,12 @@
       "category": "Decision (deferred minor)",
       "priority": "low",
       "gate": false,
-      "detail": "A few short labels live in components rather than data (eyebrow 'Meher Yar Khan · Writer', H1s 'About'/'Contact'/'For industry'). Reviewer: arguably acceptable structural labels. Leave, or move into data for strict all-copy-in-data?",
+      "detail": "✅ SETTLED (commit eeeaf24): moved into data. Author eyebrow, About/Contact eyebrow+heading, and /screen heading+subhead now live in site.labels.* / screen.* — all visible copy editable in data.",
       "source": {
         "file": ".superpowers/sdd/final-review-report.md",
         "ref": "final review — Minor"
       },
-      "column": "todo"
+      "column": "done"
     }
   ]
 }
