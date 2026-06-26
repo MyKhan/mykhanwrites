@@ -30,7 +30,8 @@
  *   email input is the focus target for the hero CTA JS enhancement.
  */
 
-import { site, novel } from '../lib/data';
+import { site } from '../lib/data';
+import { inlineMarkdown } from '../lib/inlineMarkdown';
 import { EVENTS } from '../lib/analytics';
 
 interface Props {
@@ -49,9 +50,7 @@ const formAction = isPending
 <div id={variant === 'full' ? 'letters' : undefined} class:list={['letters-form', `letters-form--${variant}`]}>
   {variant === 'full' ? (
     <>
-      <h2 class="letters-heading">
-        Read the first pages of <em class="letters-novel-title">{novel.title}</em>
-      </h2>
+      <h2 class="letters-heading" set:html={inlineMarkdown(site.letters.heading)} />
       <p class="letters-body">{site.letters.body}</p>
     </>
   ) : (

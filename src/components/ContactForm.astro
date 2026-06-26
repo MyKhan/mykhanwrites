@@ -175,10 +175,78 @@ const formAction = isPending ? '#' : 'https://api.web3forms.com/submit';
 -->
 <script>
   function bindContactForm() {
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    if (!form) return;
+
+    // activeForm tracks the live DOM form element.
+    // In the key-present path it is re-pointed after clone/replaceWith so that
+    // the reason-preselect (which runs below) always targets the DOM-active form.
+    let activeForm: HTMLFormElement = form;
+
+    // ── Web3Forms progressive enhancement ─────────────────────────────────────
+    // Only wire the fetch enhancement when the form has a real action (not '#').
+    if (!form.action.endsWith('#')) {
+      // Clone the form to remove any stale submit listener
+      const freshForm = form.cloneNode(true) as HTMLFormElement;
+      form.replaceWith(freshForm);
+
+      // Re-query after clone — this is the live DOM form post-replace
+      const requeried = document.querySelector<HTMLFormElement>('[data-contact-form]');
+      if (!requeried) return;
+      activeForm = requeried;
+
+      const activeSuccess = activeForm.querySelector<HTMLElement>('.contact-form__success');
+      const activeError = activeForm.querySelector<HTMLElement>('.contact-form__error');
+
+      activeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const activeSubmit = activeForm.querySelector<HTMLButtonElement>('.contact-form__submit');
+        if (activeSubmit) {
+          activeSubmit.disabled = true;
+          activeSubmit.textContent = 'Sending…';
+        }
+
+        // Hide any previous state
+        if (activeSuccess) activeSuccess.hidden = true;
+        if (activeError) activeError.hidden = true;
+
+        try {
+          const data = new FormData(activeForm);
+          const res = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            body: data,
+          });
+
+          const json = (await res.json()) as { success?: boolean };
+
+          if (res.ok && json.success) {
+            // Success: show success message, reset form
+            if (activeSuccess) activeSuccess.hidden = false;
+            activeForm.reset();
+          } else {
+            // API returned a non-success response
+            if (activeError) activeError.hidden = false;
+          }
+        } catch {
+          // Network error or fetch failed
+          if (activeError) activeError.hidden = false;
+        } finally {
+          if (activeSubmit) {
+            activeSubmit.disabled = false;
+            activeSubmit.textContent = 'Send';
+          }
+        }
+      });
+    }
+
     // ── Reason pre-select ──────────────────────────────────────────────────────
+    // Runs AFTER the clone (if any) so it acts on the live DOM form/select.
+    // Runs in BOTH paths: key-present (activeForm = cloned form) and
+    // pending/no-key (activeForm = original form, no clone performed).
     const param = new URLSearchParams(location.search).get('reason');
     if (param) {
-      const select = document.getElementById('cf-reason') as HTMLSelectElement | null;
+      const select = activeForm.querySelector<HTMLSelectElement>('#cf-reason');
       if (select) {
         const needle = param.toLowerCase();
         for (const option of Array.from(select.options)) {
@@ -189,62 +257,6 @@ const formAction = isPending ? '#' : 'https://api.web3forms.com/submit';
         }
       }
     }
-
-    // ── Web3Forms progressive enhancement ─────────────────────────────────────
-    // Only wire the fetch enhancement when the form has a real action (not '#').
-    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
-    if (!form || form.action.endsWith('#')) return;
-
-    // Clone the form to remove any stale submit listener
-    const freshForm = form.cloneNode(true) as HTMLFormElement;
-    form.replaceWith(freshForm);
-
-    // Re-query after clone
-    const activeForm = document.querySelector<HTMLFormElement>('[data-contact-form]');
-    if (!activeForm) return;
-    const activeSuccess = activeForm.querySelector<HTMLElement>('.contact-form__success');
-    const activeError = activeForm.querySelector<HTMLElement>('.contact-form__error');
-
-    activeForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const activeSubmit = activeForm.querySelector<HTMLButtonElement>('.contact-form__submit');
-      if (activeSubmit) {
-        activeSubmit.disabled = true;
-        activeSubmit.textContent = 'Sending…';
-      }
-
-      // Hide any previous state
-      if (activeSuccess) activeSuccess.hidden = true;
-      if (activeError) activeError.hidden = true;
-
-      try {
-        const data = new FormData(activeForm);
-        const res = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          body: data,
-        });
-
-        const json = (await res.json()) as { success?: boolean };
-
-        if (res.ok && json.success) {
-          // Success: show success message, reset form
-          if (activeSuccess) activeSuccess.hidden = false;
-          activeForm.reset();
-        } else {
-          // API returned a non-success response
-          if (activeError) activeError.hidden = false;
-        }
-      } catch {
-        // Network error or fetch failed
-        if (activeError) activeError.hidden = false;
-      } finally {
-        if (activeSubmit) {
-          activeSubmit.disabled = false;
-          activeSubmit.textContent = 'Send';
-        }
-      }
-    });
   }
 
   document.addEventListener('astro:page-load', bindContactForm);
