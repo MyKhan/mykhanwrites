@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MyKhanWrites — Launch Board</title>
+<style>
+  :root {
+    --ink: #14110F;
+    --ink-2: #1B1714;
+    --ink-3: #221D18;
+    --ink-4: #2A241E;
+    --parchment: #ECE3D2;
+    --parchment-dim: #C7BCA8;
+    --muted: #A49A88;
+    --amber: #C9A24B;
+    --amber-bright: #E0B15E;
+    --success: #8FB08A;
+    --error: #C97A6A;
+    --line: rgba(236, 227, 210, 0.12);
+    --line-strong: rgba(236, 227, 210, 0.22);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ink);
+    color: var(--parchment);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    padding: 28px 32px 18px;
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 5;
+    background: linear-gradient(180deg, var(--ink), rgba(20,17,15,0.92));
+    backdrop-filter: blur(6px);
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 500; font-size: 1.6rem; letter-spacing: -0.01em;
+    margin: 0 0 4px;
+  }
+  .subtitle { color: var(--muted); font-size: 0.88rem; max-width: 60ch; margin: 0; }
+  .progress-wrap { margin-top: 16px; max-width: 520px; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--parchment-dim); margin-bottom: 6px; }
+  .progress-bar { height: 8px; background: var(--ink-3); border-radius: 99px; overflow: hidden; border: 1px solid var(--line); }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--amber-deep, #A8812F), var(--amber)); width: 0; transition: width 0.4s ease; }
+  .stamp { font-size: 0.72rem; color: var(--muted); margin-top: 8px; }
+
+  main {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: 18px;
+    padding: 24px 32px 64px;
+    align-items: start;
+  }
+  @media (max-width: 920px) { main { grid-template-columns: 1fr; } }
+
+  .column {
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    min-height: 120px;
+    display: flex; flex-direction: column;
+  }
+  .column.drag-over { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber) inset; }
+  .column-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--parchment-dim);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .column-head .count {
+    margin-left: auto;
+    background: var(--ink-4); color: var(--muted);
+    border-radius: 99px; padding: 1px 9px; font-size: 0.74rem; font-weight: 500;
+    letter-spacing: 0;
+  }
+  .column-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+  .card {
+    background: var(--ink-3);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 12px 13px;
+    cursor: grab;
+    transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  }
+  .card:hover { border-color: var(--amber); }
+  .card.dragging { opacity: 0.5; cursor: grabbing; }
+  .card.gate { border-left: 3px solid var(--error); }
+
+  .card-top { display: flex; align-items: flex-start; gap: 8px; }
+  .dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 99px; margin-top: 6px; }
+  .dot.high { background: var(--amber-bright); }
+  .dot.med { background: var(--parchment-dim); }
+  .dot.low { background: var(--muted); }
+  .card-title { font-weight: 600; font-size: 0.95rem; line-height: 1.3; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+  .chip {
+    font-size: 0.68rem; letter-spacing: 0.02em;
+    padding: 2px 8px; border-radius: 99px;
+    background: var(--ink-4); color: var(--parchment-dim); border: 1px solid var(--line);
+  }
+  .chip.gate { background: rgba(201,122,106,0.14); color: var(--error); border-color: rgba(201,122,106,0.4); font-weight: 600; }
+
+  .detail { font-size: 0.8rem; color: var(--muted); line-height: 1.5; margin: 9px 0 0; }
+
+  .card-foot { display: flex; align-items: center; gap: 8px; margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--line); }
+  .source-link { font-size: 0.72rem; color: var(--amber); text-decoration: none; border-bottom: 1px solid transparent; }
+  .source-link:hover { border-bottom-color: var(--amber); }
+  .moves { margin-left: auto; display: flex; gap: 4px; }
+  .move-btn {
+    background: var(--ink-4); color: var(--parchment-dim);
+    border: 1px solid var(--line-strong); border-radius: 6px;
+    width: 26px; height: 24px; cursor: pointer; font-size: 0.8rem; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .move-btn:hover:not(:disabled) { background: var(--amber); color: var(--ink); border-color: var(--amber); }
+  .move-btn:disabled { opacity: 0.3; cursor: default; }
+  .move-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .card.done .card-title { color: var(--parchment-dim); }
+  .card.done { opacity: 0.82; }
+
+  .empty { color: var(--muted); font-size: 0.8rem; font-style: italic; padding: 8px 4px; }
+
+  #toast {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink-4); color: var(--parchment); border: 1px solid var(--line-strong);
+    padding: 10px 18px; border-radius: 8px; font-size: 0.84rem;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 20;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.err { border-color: var(--error); color: var(--error); }
+</style>
+</head>
+<body>
+  <header>
+    <h1 id="board-title">Launch Board</h1>
+    <p class="subtitle" id="board-subtitle"></p>
+    <div class="progress-wrap">
+      <div class="progress-meta"><span id="progress-label">—</span><span id="progress-pct"></span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="stamp" id="stamp"></div>
+    </div>
+  </header>
+  <main id="board"></main>
+  <div id="toast"></div>
+
+<script>
+  const PRIORITY_LABEL = { high: 'High', med: 'Medium', low: 'Low' };
+  let board = null;
+  let draggingId = null;
+
+  async function api(path, options) {
+    const res = await fetch(path, options);
+    if (!res.ok) {
+      const msg = await res.json().catch(() => ({}));
+      throw new Error(msg.error || res.statusText);
+    }
+    return res.json();
+  }
+
+  function toast(message, isError = false) {
+    const el = document.getElementById('toast');
+    el.textContent = message;
+    el.classList.toggle('err', isError);
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  function columnIndex(id) { return board.columns.findIndex((c) => c.id === id); }
+
+  async function move(id, column) {
+    const task = board.tasks.find((t) => t.id === id);
+    if (!task || task.column === column) return;
+    try {
+      board = await api('/api/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, column }),
+      });
+      render();
+      const col = board.columns.find((c) => c.id === column);
+      toast('Saved → docs/PENDING_ASSETS.md  ·  ' + task.title + ' → ' + col.name);
+    } catch (err) {
+      toast('Move failed: ' + err.message, true);
+      await load();
+    }
+  }
+
+  function makeCard(task) {
+    const card = document.createElement('article');
+    card.className = 'card priority-' + task.priority + (task.gate ? ' gate' : '') + (task.column === 'done' ? ' done' : '');
+    card.draggable = true;
+    card.dataset.id = task.id;
+
+    const top = document.createElement('div');
+    top.className = 'card-top';
+    const dot = document.createElement('span');
+    dot.className = 'dot ' + task.priority;
+    dot.title = PRIORITY_LABEL[task.priority] + ' priority';
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.textContent = task.title;
+    top.append(dot, title);
+
+    const chips = document.createElement('div');
+    chips.className = 'chips';
+    const cat = document.createElement('span');
+    cat.className = 'chip';
+    cat.textContent = task.category;
+    chips.append(cat);
+    if (task.gate) {
+      const g = document.createElement('span');
+      g.className = 'chip gate';
+      g.textContent = '⛔ Hard gate';
+      chips.append(g);
+    }
+
+    const detail = document.createElement('p');
+    detail.className = 'detail';
+    detail.textContent = task.detail;
+
+    const foot = document.createElement('div');
+    foot.className = 'card-foot';
+    if (task.source && task.source.file) {
+      const link = document.createElement('a');
+      link.className = 'source-link';
+      link.href = '/open?path=' + encodeURIComponent(task.source.file);
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = '📄 ' + (task.source.ref || task.source.file);
+      foot.append(link);
+    }
+    const moves = document.createElement('div');
+    moves.className = 'moves';
+    const idx = columnIndex(task.column);
+    const left = document.createElement('button');
+    left.className = 'move-btn'; left.textContent = '◀'; left.title = 'Move left';
+    left.disabled = idx <= 0;
+    left.addEventListener('click', () => move(task.id, board.columns[idx - 1].id));
+    const right = document.createElement('button');
+    right.className = 'move-btn'; right.textContent = '▶'; right.title = 'Move right';
+    right.disabled = idx >= board.columns.length - 1;
+    right.addEventListener('click', () => move(task.id, board.columns[idx + 1].id));
+    moves.append(left, right);
+    foot.append(moves);
+
+    card.append(top, chips, detail, foot);
+
+    card.addEventListener('dragstart', (e) => {
+      draggingId = task.id;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', task.id);
+    });
+    card.addEventListener('dragend', () => {
+      draggingId = null;
+      card.classList.remove('dragging');
+    });
+    return card;
+  }
+
+  function makeColumn(column) {
+    const col = document.createElement('section');
+    col.className = 'column';
+    col.dataset.column = column.id;
+
+    const head = document.createElement('div');
+    head.className = 'column-head';
+    const tasksInCol = board.tasks.filter((t) => t.column === column.id);
+    head.innerHTML = '<span>' + (column.emoji || '') + ' ' + column.name + '</span>';
+    const count = document.createElement('span');
+    count.className = 'count';
+    count.textContent = tasksInCol.length;
+    head.append(count);
+
+    const body = document.createElement('div');
+    body.className = 'column-body';
+    if (tasksInCol.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Nothing here yet.';
+      body.append(empty);
+    } else {
+      tasksInCol.forEach((t) => body.append(makeCard(t)));
+    }
+
+    col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', (e) => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      const id = draggingId || e.dataTransfer.getData('text/plain');
+      if (id) move(id, column.id);
+    });
+
+    col.append(head, body);
+    return col;
+  }
+
+  function render() {
+    document.getElementById('board-title').textContent = board.title || 'Launch Board';
+    document.getElementById('board-subtitle').textContent = board.subtitle || '';
+    const total = board.tasks.length;
+    const done = board.tasks.filter((t) => t.column === 'done').length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById('progress-label').textContent = done + ' of ' + total + ' done';
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('stamp').textContent = board.updatedAt
+      ? 'Last saved ' + new Date(board.updatedAt).toLocaleString()
+      : 'No moves yet.';
+
+    const main = document.getElementById('board');
+    main.innerHTML = '';
+    board.columns.forEach((c) => main.append(makeColumn(c)));
+  }
+
+  async function load() {
+    try {
+      board = await api('/api/tasks');
+      render();
+    } catch (err) {
+      document.getElementById('board').innerHTML =
+        '<p class="empty">Could not load tasks: ' + err.message + '</p>';
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>

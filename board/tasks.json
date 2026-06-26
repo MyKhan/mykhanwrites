@@ -1,0 +1,336 @@
+{
+  "title": "MyKhanWrites — Launch Board",
+  "subtitle": "Everything still on Meher's side before go-live. The build is feature-complete; these are creds, assets, and sign-offs.",
+  "updatedAt": null,
+  "columns": [
+    {
+      "id": "todo",
+      "name": "To Do",
+      "emoji": "⬜"
+    },
+    {
+      "id": "inProgress",
+      "name": "In Progress",
+      "emoji": "🔄"
+    },
+    {
+      "id": "done",
+      "name": "Done",
+      "emoji": "✅"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "cred-hostinger",
+      "title": "Hostinger access + deploy method",
+      "category": "Credentials (Decision E)",
+      "priority": "high",
+      "gate": false,
+      "detail": "Confirm SSH/SFTP or Git-deploy access and test the upload path for dist/. This is the deploy target.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "Deployment checks"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "cred-inbox",
+      "title": "Live hello@mykhanwrites.com inbox",
+      "category": "Credentials (Decision E)",
+      "priority": "high",
+      "gate": false,
+      "detail": "Mailbox created, live, and tested. Web3Forms delivers contact submissions here; it's also the obfuscated address shown on /contact, /screen, and the footer.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #5"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "cred-kit",
+      "title": "Kit form id (PUBLIC_KIT_FORM_ID)",
+      "category": "Credentials (Decision E)",
+      "priority": "high",
+      "gate": false,
+      "detail": "Create the Kit account + signup form, set double opt-in, and tags source:mykhanwrites / interest:novel-launch. Put the form id in .env / CI. LettersForm degrades to a disabled 'pending' state until set.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #8"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "cred-web3forms",
+      "title": "Web3Forms access key (PUBLIC_WEB3FORMS_ACCESS_KEY)",
+      "category": "Credentials (Decision E)",
+      "priority": "high",
+      "gate": false,
+      "detail": "Create the Web3Forms account, point it at the hello@ inbox, set the access key in .env / CI. ContactForm shows a graceful fallback until set.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #9"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "cred-umami",
+      "title": "Umami website id (PUBLIC_UMAMI_ID)",
+      "category": "Credentials (Decision E)",
+      "priority": "med",
+      "gate": false,
+      "detail": "Umami Cloud free tier; add the site, set the id in .env / CI, then verify all 7 custom events fire. Analytics is simply absent until set (no breakage).",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #10"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "gate-copyright",
+      "title": "File US Copyright for the screenplay (C4)",
+      "category": "Hard gate",
+      "priority": "high",
+      "gate": true,
+      "detail": "HARD BLOCKER. Do NOT rebuild with SCREEN_PUBLISHED=true or un-gate /screen until the Copyright Office confirmation is in hand.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #14 / Hard blockers"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "gate-screen-content",
+      "title": "Fill /screen specifics (after C4 only)",
+      "category": "Hard gate",
+      "priority": "med",
+      "gate": false,
+      "detail": "Once C4 is filed: fill screen.json logline/synopsis/themes/comps (honest [PENDING] now), screen.md SEO title+description, imdbProUrl, and review screen.bio. Then SCREEN_PUBLISHED=true.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #13"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "signoff-visual",
+      "title": "Anti-template visual sign-off (C5)",
+      "category": "Sign-off",
+      "priority": "high",
+      "gate": true,
+      "detail": "HARD BLOCKER. Eyes-on review at 380 / 768 / 1440 / large widths vs mockups/styleguide.html. Confirm it doesn't look templated/AI-generated; locked dusk palette; copy verbatim.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "C5 / Hard blockers"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "signoff-crane",
+      "title": "Crane + favicon redesign sign-off",
+      "category": "Sign-off",
+      "priority": "med",
+      "gate": false,
+      "detail": "Approve (or replace) the current crane SVG used in the favicon, footer, and maintenance.html. Functional improvement awaiting your explicit go/no-go.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #12"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "check-axe",
+      "title": "axe accessibility scan — 0 violations",
+      "category": "Pre-launch check",
+      "priority": "high",
+      "gate": false,
+      "detail": "Run axe against the full-site build (all 5 routes + 404). Deferred in-session (no headless Chrome). Exact command + setup in the phase-12 report. `npm run verify:a11y`.",
+      "source": {
+        "file": ".superpowers/sdd/phase-12-report.md",
+        "ref": "phase-12 report (axe commands)"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "check-lighthouse",
+      "title": "Lighthouse ≥ 90 (Perf / A11y / BP / SEO)",
+      "category": "Pre-launch check",
+      "priority": "high",
+      "gate": false,
+      "detail": "Run Lighthouse CI on home + novel. .lighthouserc.json and the exact command are in the phase-12 report. Target ≥90 on all four categories.",
+      "source": {
+        "file": ".superpowers/sdd/phase-12-report.md",
+        "ref": "phase-12 report (Lighthouse)"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "check-links",
+      "title": "Live external-link smoke test",
+      "category": "Pre-launch check",
+      "priority": "med",
+      "gate": false,
+      "detail": "Internal links pass (`npm run verify:links`). Before launch, click through the real external links (Instagram, comparemydrafts.com, onlywhenitrains.com, ManTalksMedia) against the live site.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "Functional checks"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "check-jsonld",
+      "title": "JSON-LD Rich Results validation",
+      "category": "Pre-launch check",
+      "priority": "med",
+      "gate": false,
+      "detail": "Validate the Person (/about) and Book (/novel) JSON-LD with Google's Rich Results Test once the site is reachable.",
+      "source": {
+        "file": ".superpowers/sdd/phase-12-report.md",
+        "ref": "phase-12 report"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "check-contact-reason",
+      "title": "/contact?reason=screen browser smoke test",
+      "category": "Pre-launch check",
+      "priority": "med",
+      "gate": false,
+      "detail": "The reason-preselect (I1) fix is code-correct but unverified in a real browser. With a configured Web3Forms key, open /contact?reason=screen and confirm 'Film / screen' is pre-selected after the form hydrates.",
+      "source": {
+        "file": ".superpowers/sdd/final-review-report.md",
+        "ref": "final review — Important #1"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "asset-author-photo",
+      "title": "Author photo",
+      "category": "Asset",
+      "priority": "med",
+      "gate": false,
+      "detail": "Window-lit, muted, authentic. Warm/dark palette. No corporate headshot, no dark-room, no desk. Used on /about hero + homepage About preview.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #1"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "asset-novel-hero",
+      "title": "Novel-hero image (4:5 + 16:9 crops)",
+      "category": "Asset",
+      "priority": "med",
+      "gate": false,
+      "detail": "Japanese commuter-station/café at dusk, cinematic rainy. Portrait 4:5 + landscape 16:9. Warm interior light vs rain-grey; platform, doubling reflections. Used on /novel hero + home Novel bridge.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #2"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "asset-og-crop",
+      "title": "OG share image crop (1200×630)",
+      "category": "Asset",
+      "priority": "med",
+      "gate": false,
+      "detail": "Crop from the final novel-hero. Replaces the on-brand placeholder in public/og/. Must be exactly 1200×630.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #3 (T20)"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "asset-ch1-pdf",
+      "title": "Chapter 1 PDF + Kit welcome wiring",
+      "category": "Asset",
+      "priority": "med",
+      "gate": false,
+      "detail": "'The Night It Started' PDF hosted on Kit or a CDN; the URL goes into the Kit welcome automation that delivers on signup.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #4"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "asset-quotes",
+      "title": "Early-reader quotes",
+      "category": "Asset",
+      "priority": "low",
+      "gate": false,
+      "detail": "Genuine early-reader quotes only — never placeholder or AI. Add to src/data/novel.json quotes[]; the slot stays empty (no fabrication) until then.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #6"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "asset-tiktok",
+      "title": "TikTok link (@mykhanwrites)",
+      "category": "Asset",
+      "priority": "low",
+      "gate": false,
+      "detail": "Add the URL to src/data/site.json social links when the account is live. X stays reserved — do NOT link.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #7"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "asset-cover",
+      "title": "Final book cover",
+      "category": "Asset",
+      "priority": "low",
+      "gate": false,
+      "detail": "Replace the placeholder cover slot on /novel when the final cover art is delivered. Possible secondary OG use.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #11"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "asset-hero-texture",
+      "title": "Author-hero texture / background",
+      "category": "Asset",
+      "priority": "low",
+      "gate": false,
+      "detail": "Dark charcoal field, optional restrained film-grain, warm. No writer's-desk photo. Homepage hero dark background.",
+      "source": {
+        "file": "docs/PENDING_ASSETS.md",
+        "ref": "asset #15"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "decide-plaintext-email",
+      "title": "Decide: plaintext hello@ in fallback copy",
+      "category": "Decision (deferred minor)",
+      "priority": "low",
+      "gate": false,
+      "detail": "site.json web3formsPending / newsletterError embed the raw hello@ address (only shown in the degraded no-key state). Deliberately public, but defeats obfuscation there. Keep as-is, or have me render it obfuscated?",
+      "source": {
+        "file": ".superpowers/sdd/final-review-report.md",
+        "ref": "final review — Minor"
+      },
+      "column": "todo"
+    },
+    {
+      "id": "decide-labels",
+      "title": "Decide: normalize short label literals",
+      "category": "Decision (deferred minor)",
+      "priority": "low",
+      "gate": false,
+      "detail": "A few short labels live in components rather than data (eyebrow 'Meher Yar Khan · Writer', H1s 'About'/'Contact'/'For industry'). Reviewer: arguably acceptable structural labels. Leave, or move into data for strict all-copy-in-data?",
+      "source": {
+        "file": ".superpowers/sdd/final-review-report.md",
+        "ref": "final review — Minor"
+      },
+      "column": "todo"
+    }
+  ]
+}
